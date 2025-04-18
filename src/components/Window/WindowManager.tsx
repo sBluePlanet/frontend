@@ -1,14 +1,20 @@
 import { useState, ReactNode } from "react";
 import { css } from "@emotion/react";
-import { colors } from "../../styles/theme";
+import { colors, fonts } from "../../styles/theme";
 
-import LeftBar from "../Bar/LeftBar";
 import Window from "./Window";
 import EmailWindow from "../Email/EmailWindow";
 import EmailDetail from "../Email/EmailDetail";
 import EmailCompose from "../Email/EmailCompose";
 import NewsWindow from "../News/NewsWindow";
 import NewsDetail from "../News/NewsDetail";
+import {
+  HiOutlineMail,
+  HiOutlineNewspaper,
+  HiOutlineLightBulb,
+} from "react-icons/hi";
+import { IoSettingsOutline } from "react-icons/io5";
+
 import { dummyEmails, dummyNews } from "../../dummy/dummyData";
 
 interface WindowData {
@@ -87,19 +93,13 @@ const WindowManager = () => {
   const predefinedMap = {
     email: () =>
       openWindow("email", {
-        title: "email",
+        title: "E-MAIL",
         content: <EmailWindow onEmailClick={handleEmailClick} />,
         key: "email",
       }),
-    chat: () =>
-      openWindow("chat", {
-        title: "chat",
-        content: "채팅기능 없는데용?",
-        key: "chat",
-      }),
     news: () =>
       openWindow("news", {
-        title: "news",
+        title: "NEWS",
         content: <NewsWindow onNewsClick={handleNewsClick} />,
         key: "news",
       }),
@@ -109,7 +109,7 @@ const WindowManager = () => {
     if (emailId === -1) {
       openWindow("email-compose", {
         key: "email-compose",
-        title: "📨 새 이메일 작성",
+        title: "새 이메일 작성",
         content: <EmailCompose />,
       });
       return;
@@ -120,7 +120,7 @@ const WindowManager = () => {
 
     openWindow("email-detail", {
       key: `email-detail:${email.id}`,
-      title: `📧 ${email.title}`,
+      title: `${email.title}`,
       content: <EmailDetail title={email.title} content={email.content} />,
     });
   };
@@ -131,15 +131,33 @@ const WindowManager = () => {
 
     openWindow("news-detail", {
       key: `news-detail:${news.id}`,
-      title: `📰 ${news.title}`,
+      title: `${news.title}`,
       content: <NewsDetail title={news.title} content={news.content} />,
     });
   };
 
   return (
     <div css={desktopCss}>
-      <LeftBar open={(type) => predefinedMap[type]?.()} />
       <div css={screenCss}>
+        <div css={desktopIconContainerCss}>
+          <div css={desktopIconCss} onClick={() => predefinedMap["email"]?.()}>
+            <HiOutlineMail size={40} />
+            <div>Email</div>
+          </div>
+          <div css={desktopIconCss} onClick={() => predefinedMap["news"]?.()}>
+            <HiOutlineNewspaper size={40} />
+            <div>News</div>
+          </div>
+          <div css={desktopIconCss}>
+            <HiOutlineLightBulb size={40} />
+            <div>Tips</div>
+          </div>
+          <div css={desktopIconCss}>
+            <IoSettingsOutline size={40} />
+            <div>Setting</div>
+          </div>
+        </div>
+
         {windows.map((w) => (
           <Window
             key={w.id}
@@ -172,4 +190,30 @@ const screenCss = css({
   flex: 1,
   position: "relative",
   overflow: "hidden",
+});
+
+const desktopIconContainerCss = css({
+  position: "absolute",
+  top: 40,
+  left: 40,
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+});
+
+const desktopIconCss = css({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "15px 20px",
+  gap: "5px",
+  color: colors.neon,
+  cursor: "pointer",
+  fontSize: "15px",
+  fontFamily: fonts.fixel,
+  "&:hover": {
+    backgroundColor: colors.wBackground,
+    color: colors.white,
+  },
 });

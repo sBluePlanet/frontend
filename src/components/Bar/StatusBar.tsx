@@ -1,15 +1,22 @@
 import { css } from "@emotion/react";
+import { colors } from "../../styles/theme";
 import { useStatusStore } from "../../stores/useStatusStore";
+import { ReactNode } from "react";
+
+import { FaWind } from "react-icons/fa";
+import { GiWaterDrop } from "react-icons/gi";
+import { FaHeartbeat } from "react-icons/fa";
+import { FaPerson } from "react-icons/fa6";
 
 const StatusBar = () => {
   const { air, water, life, support } = useStatusStore();
 
   return (
     <div css={statusBarCss}>
-      <Gauge icon="AIR" value={air} />
-      <Gauge icon="WATER" value={water} />
-      <Gauge icon="LIFT" value={life} />
-      <Gauge icon="SUPPORT" value={support} />
+      <Gauge icon={<FaWind />} value={air} />
+      <Gauge icon={<GiWaterDrop />} value={water} />
+      <Gauge icon={<FaHeartbeat />} value={life} />
+      <Gauge icon={<FaPerson />} value={support} />
     </div>
   );
 };
@@ -17,14 +24,14 @@ const StatusBar = () => {
 export default StatusBar;
 
 interface GaugeProps {
-  icon: string;
+  icon: ReactNode;
   value: number;
 }
 
 const Gauge = ({ icon, value }: GaugeProps) => {
   return (
     <div css={gaugeCss}>
-      {icon}
+      <span css={iconCss}>{icon}</span>
       <div css={gaugeBarCss}>
         <div css={fillCss(value)} />
       </div>
@@ -34,7 +41,7 @@ const Gauge = ({ icon, value }: GaugeProps) => {
 
 const statusBarCss = css({
   display: "flex",
-  gap: "16px",
+  gap: "50px",
   alignItems: "center",
   fontSize: "14px",
 });
@@ -45,17 +52,24 @@ const gaugeCss = css({
   gap: "6px",
 });
 
+const iconCss = css({
+  fontSize: "20px",
+  marginRight: "8px",
+  color: colors.neon,
+});
+
 const gaugeBarCss = css({
   width: "80px",
-  height: "10px",
-  backgroundColor: "#444",
+  height: "15px",
+  backgroundColor: colors.neon,
   overflow: "hidden",
+  clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
 });
 
 const fillCss = (value: number) =>
   css({
     width: `${value}%`,
     height: "100%",
-    backgroundColor: "#157e75",
+    backgroundColor: colors.wBackground,
     transition: "width 0.3s ease",
   });

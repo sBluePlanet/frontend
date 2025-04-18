@@ -1,20 +1,18 @@
 import { css } from "@emotion/react";
+import { HiOutlineMail, HiOutlineNewspaper } from "react-icons/hi";
 
 interface LeftBarProps {
-  open: (type: "email" | "chat" | "news") => void;
+  open: (type: "email" | "news") => void;
 }
 
 const LeftBar = ({ open }: LeftBarProps) => {
   return (
     <div css={leftBarCss}>
       <button css={btnCss} onClick={() => open("email")}>
-        📧
-      </button>
-      <button css={btnCss} onClick={() => open("chat")}>
-        💬
+        <HiOutlineMail size={30} />
       </button>
       <button css={btnCss} onClick={() => open("news")}>
-        📰
+        <HiOutlineNewspaper size={30} />
       </button>
     </div>
   );
@@ -23,18 +21,17 @@ const LeftBar = ({ open }: LeftBarProps) => {
 export default LeftBar;
 
 const leftBarCss = css({
-  backgroundColor: "#012b36",
-  color: "white",
-  padding: "20px",
-  boxSizing: "border-box",
+  // backgroundColor: colors.bBackground,
+  padding: "30px",
+  gap: "12px",
   display: "flex",
   flexDirection: "column",
-  gap: "12px",
 });
 
 const btnCss = css({
   padding: "10px",
   backgroundColor: "transparent",
+  border: 0,
   color: "white",
   cursor: "pointer",
   "&:hover": {

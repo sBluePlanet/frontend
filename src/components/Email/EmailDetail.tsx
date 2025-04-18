@@ -1,7 +1,6 @@
-import { useState } from "react";
 import { css } from "@emotion/react";
-
 import { dummyTooltip } from "../../dummy/dummyData";
+import { useTooltipStore } from "../../stores/useTooltipStore";
 
 const EmailDetailWindow = ({
   title,
@@ -10,7 +9,7 @@ const EmailDetailWindow = ({
   title: string;
   content: string;
 }) => {
-  const [hoveredWord, setHoveredWord] = useState<string | null>(null);
+  const { show, hide } = useTooltipStore();
   const parts = content.split(/(\^.+?\^)/g);
 
   return (
@@ -25,15 +24,13 @@ const EmailDetailWindow = ({
               <span
                 key={i}
                 css={tooltipTarget}
-                onMouseEnter={() => setHoveredWord(word)}
-                onMouseLeave={() => setHoveredWord(null)}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  show(rect.left + 5, rect.bottom + 3, dummyTooltip[word]);
+                }}
+                onMouseLeave={hide}
               >
                 {word}
-                {hoveredWord === word && (
-                  <span css={tooltipCss}>
-                    {dummyTooltip[word] || "정보 없음"}
-                  </span>
-                )}
               </span>
             );
           } else {
@@ -53,22 +50,7 @@ const wrapperCss = css({
 });
 
 const tooltipTarget = css({
-  position: "relative",
   textDecoration: "underline dotted",
   cursor: "help",
   margin: "0 2px",
-});
-
-const tooltipCss = css({
-  position: "absolute",
-  top: "100%",
-  left: "0",
-  backgroundColor: "#222",
-  color: "white",
-  fontSize: "12px",
-  padding: "6px 10px",
-  borderRadius: "4px",
-  whiteSpace: "nowrap",
-  marginTop: "4px",
-  zIndex: 999,
 });

@@ -1,5 +1,6 @@
 import { useState, useRef, ReactNode, useEffect } from "react";
 import { css } from "@emotion/react";
+import { colors, fonts } from "../../styles/theme";
 
 interface WindowProps {
   id: number;
@@ -78,22 +79,23 @@ const windowCss = (x: number, y: number, z: number) =>
     left: x,
     zIndex: z,
     width: "300px",
-    backgroundColor: "#002b36",
-    fontFamily: "monospace",
     userSelect: "none",
+    backgroundColor: colors.wBackground,
     color: "#ffffff",
-    borderRadius: "5px",
+    clipPath: "polygon(20px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 20px)",
+    border: `1px solid ${colors.neon}`,
   });
 
 const windowTopCss = css({
-  padding: "8px",
-  backgroundColor: "#073642",
-  cursor: "move",
-  fontWeight: "bold",
-  borderBottom: "1px solid white",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
+  cursor: "move",
+  padding: "8px 10px 8px 30px",
+  background: `linear-gradient(to right, ${colors.neon}, rgba(10, 183, 163, 0))`,
+  borderBottom: `1px solid ${colors.neon}`,
+  fontFamily: fonts.fixel,
+  color: "white",
 });
 
 const contentCss = css({
@@ -104,8 +106,8 @@ const contentCss = css({
 const closeCss = css({
   cursor: "pointer",
   padding: "0 8px",
-  fontSize: "18px",
+  fontSize: "20px",
   "&:hover": {
-    color: "#ff4444",
+    color: colors.red,
   },
 });
