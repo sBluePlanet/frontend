@@ -1,14 +1,20 @@
 import { useState, ReactNode } from "react";
 import { css } from "@emotion/react";
-import Window from "../Window/Window";
-import LeftBar from "../Bar/LeftBar";
 import { colors } from "../../styles/theme";
 
-type WindowType = "email" | "chat" | "news";
+import LeftBar from "../Bar/LeftBar";
+import Window from "./Window";
+import EmailWindow from "../Email/EmailWindow";
+import EmailDetail from "../Email/EmailDetail";
+import EmailCompose from "../Email/EmailCompose";
+import NewsWindow from "../News/NewsWindow";
+import NewsDetail from "../News/NewsDetail";
+import { dummyEmails, dummyNews } from "../../dummy/dummyData";
 
 interface WindowData {
   id: number;
-  type: WindowType;
+  key: string;
+  type: string;
   title: string;
   content: ReactNode;
   x: number;
@@ -22,53 +28,117 @@ const WindowManager = () => {
   const [windows, setWindows] = useState<WindowData[]>([]);
   const [zIndex, setZIndex] = useState(10);
 
-  const openWindow = (type: WindowType) => {
-    if (windows.some((w) => w.type === type)) return;
+  const bringToFront = (id: number) => {
+    setZIndex((prev) => {
+      const newZ = prev + 1;
+      setWindows((prevWindows) =>
+        prevWindows.map((w) => (w.id === id ? { ...w, zIndex: newZ } : w))
+      );
+      return newZ;
+    });
+  };
 
-    const titleMap = {
-      email: "email",
-      chat: "chat",
-      news: "news",
-    };
+  const openWindow = (
+    type: string,
+    payload: {
+      title: string;
+      content: ReactNode;
+      key?: string;
+    }
+  ) => {
+    const windowKey = payload.key || `${type}:${payload.title}`;
 
-    const contentMap = {
-      email: (
-        <p>
-          from. Yun <br /> 우린할수잇다알지?
-        </p>
-      ),
-      chat: <p>GPT 선생님 도와주세요</p>,
-      news: <p>속보: 지구 멸망합니다!</p>,
-    };
+    setWindows((prev) => {
+      const existing = prev.find((w) => w.key === windowKey);
+      if (existing) {
+        bringToFront(existing.id);
+        return prev;
+      }
 
-    const newWindow: WindowData = {
-      id: nextId++,
-      type,
-      title: titleMap[type],
-      content: contentMap[type],
-      x: 100 + windows.length * 30,
-      y: 100 + windows.length * 30,
-      zIndex: zIndex,
-    };
+      const newZ = zIndex + 1;
+      setZIndex(newZ);
 
-    setWindows((prev) => [...prev, newWindow]);
-    setZIndex((prev) => prev + 1);
+      const screenWidth = window.innerWidth;
+      const screenHeight = window.innerHeight;
+      const centerX = screenWidth / 2 - 150;
+      const centerY = screenHeight / 2 - 100;
+      const offsetX = Math.floor(Math.random() * 100 - 50);
+      const offsetY = Math.floor(Math.random() * 100 - 50);
+
+      const newWindow: WindowData = {
+        id: nextId++,
+        key: windowKey,
+        type,
+        title: payload.title,
+        content: payload.content,
+        x: centerX + offsetX,
+        y: centerY + offsetY,
+        zIndex: newZ,
+      };
+
+      return [...prev, newWindow];
+    });
   };
 
   const closeWindow = (id: number) => {
     setWindows((prev) => prev.filter((w) => w.id !== id));
   };
 
-  const bringToFront = (id: number) => {
-    setWindows((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, zIndex: zIndex } : w))
-    );
-    setZIndex((prev) => prev + 1);
+  const predefinedMap = {
+    email: () =>
+      openWindow("email", {
+        title: "email",
+        content: <EmailWindow onEmailClick={handleEmailClick} />,
+        key: "email",
+      }),
+    chat: () =>
+      openWindow("chat", {
+        title: "chat",
+        content: "채팅기능 없는데용?",
+        key: "chat",
+      }),
+    news: () =>
+      openWindow("news", {
+        title: "news",
+        content: <NewsWindow onNewsClick={handleNewsClick} />,
+        key: "news",
+      }),
+  };
+
+  const handleEmailClick = (emailId: number) => {
+    if (emailId === -1) {
+      openWindow("email-compose", {
+        key: "email-compose",
+        title: "📨 새 이메일 작성",
+        content: <EmailCompose />,
+      });
+      return;
+    }
+
+    const email = dummyEmails.find((e) => e.id === emailId);
+    if (!email) return;
+
+    openWindow("email-detail", {
+      key: `email-detail:${email.id}`,
+      title: `📧 ${email.title}`,
+      content: <EmailDetail title={email.title} content={email.content} />,
+    });
+  };
+
+  const handleNewsClick = (newsId: number) => {
+    const news = dummyNews.find((n) => n.id === newsId);
+    if (!news) return;
+
+    openWindow("news-detail", {
+      key: `news-detail:${news.id}`,
+      title: `📰 ${news.title}`,
+      content: <NewsDetail title={news.title} content={news.content} />,
+    });
   };
 
   return (
     <div css={desktopCss}>
-      <LeftBar open={openWindow} />
+      <LeftBar open={(type) => predefinedMap[type]?.()} />
       <div css={screenCss}>
         {windows.map((w) => (
           <Window
