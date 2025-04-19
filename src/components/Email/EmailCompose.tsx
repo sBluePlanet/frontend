@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
+
 import { getAdvice } from "../../api/gptApi";
 import { useWindowStore } from "../../stores/useWindowStore";
-import EmailDetailWindow from "../Email/EmailDetail";
 import { useEventStore } from "../../stores/useEventStore";
+import { useEmailStore } from "../../stores/useEmailStore";
 import EmailWaitingWindow from "../Email/EmailWaiting";
+import EmailDetailWindow from "../Email/EmailDetail";
 
 const EmailCompose = () => {
   const [title, setTitle] = useState("");
@@ -13,9 +15,29 @@ const EmailCompose = () => {
   const pushWindow = useWindowStore((state) => state.pushWindow);
   const eventId = useEventStore((state) => state.eventId);
 
+  const emailQuota = useEmailStore((state) => state.emailQuota);
+  const decreaseQuota = useEmailStore((state) => state.decreaseQuota);
+
   const handleSend = async () => {
     if (!title || !content) return;
     if (eventId === null) return;
+
+    if (emailQuota <= 0) {
+      pushWindow({
+        type: "alert",
+        title: "이메일 제한",
+        key: "email-limit-alert",
+        color: colors.red,
+        content: (
+          <div css={{ padding: "10px", textAlign: "center" }}>
+            더 이상 메시지를 보낼 수 없습니다
+          </div>
+        ),
+        closable: true,
+        width: 300,
+      });
+      return;
+    }
 
     const waitingKey = `waiting:${Date.now()}`;
 
@@ -33,6 +55,8 @@ const EmailCompose = () => {
       const res = await getAdvice(eventId, title, content);
       useWindowStore.getState().requestCloseWindow(waitingKey);
 
+      decreaseQuota();
+
       pushWindow({
         type: "email-detail",
         key: `advice:${Date.now()}`,
@@ -41,10 +65,13 @@ const EmailCompose = () => {
           <EmailDetailWindow
             title={`RE: ${title}`}
             content={res.content}
-            writer="과학자 어쩌고"
+            writer="박병호 과학 전문가"
           />
         ),
       });
+
+      const { getList: getEmailList } = useEmailStore.getState();
+      await getEmailList();
     } catch (err) {
       console.error("Advice 요청 실패:", err);
     }
@@ -54,7 +81,7 @@ const EmailCompose = () => {
     <div css={composeCss}>
       <div css={fieldCss}>
         <label css={labelCss}>To</label>
-        <div css={receiverCss}>과학자 누구 씨</div>
+        <div css={receiverCss}>박병호 과학 전문가</div>
       </div>
       <div css={fieldCss}>
         <label css={labelCss}>제목</label>
@@ -72,7 +99,7 @@ const EmailCompose = () => {
         onChange={(e) => setContent(e.target.value)}
       />
       <button css={sendBtnCss} onClick={handleSend}>
-        보내기 (3/3)
+        보내기 ({emailQuota} / 3)
       </button>
     </div>
   );

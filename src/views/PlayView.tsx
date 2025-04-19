@@ -26,10 +26,13 @@ import TooltipLayer from "../components/Guide/TooltipLayer";
 import EventEmailWindow from "../components/Event/EventEmailWindow";
 import EventNewsWindow from "../components/Event/EventNewsWindow";
 import GameSummary from "../components/Event/GameSummary";
+import EndingAlert from "../components/Event/EndingAlert";
+import { useNewsStore } from "../stores/useNewsStore";
 
 const PlayView = () => {
   const [isGameStartVisible, setGameStartVisible] = useState(true);
   const [prologue, setPrologue] = useState({ title: "", content: "" });
+  const [isEndingAlertVisible, setEndingAlertVisible] = useState(false);
   const [ending, setEnding] = useState<{
     title: string;
     content: string;
@@ -39,10 +42,7 @@ const PlayView = () => {
 
   const setUserId = useStatusStore((state) => state.setUserId);
   const setStatus = useStatusStore((state) => state.setStatus);
-  const nextEvent = useEventStore((state) => state.nextEvent);
   const setNextEvent = useEventStore((state) => state.setNextEvent);
-  const turn = useTurnStore((state) => state.turn);
-  const decreaseTurn = useTurnStore((state) => state.decreaseTurn);
 
   const { visible, x, y, content } = useTooltipStore();
   const pushWindow = useWindowStore((state) => state.pushWindow);
@@ -52,15 +52,7 @@ const PlayView = () => {
     const init = async () => {
       try {
         const data = await getStartData();
-        const { prologue, userStatus, nextEvent } = data;
-
-        const tooltips = await getTooltips();
-        useTooltipStore.getState().setTooltipData(tooltips);
-
-        setPrologue({
-          title: prologue.title,
-          content: prologue.content,
-        });
+        const { userStatus } = data;
 
         setUserId(userStatus.userId);
         setStatus("air", userStatus.air);
@@ -68,7 +60,16 @@ const PlayView = () => {
         setStatus("life", userStatus.biology);
         setStatus("support", userStatus.popularity);
 
-        setNextEvent(nextEvent);
+        const prologueEvent = await getSpecialEvent();
+        setPrologue({
+          title: prologueEvent.title,
+          content: prologueEvent.content,
+        });
+
+        setNextEvent(prologueEvent.nextEvent);
+
+        const tooltips = await getTooltips();
+        useTooltipStore.getState().setTooltipData(tooltips);
       } catch (error) {
         console.error("Failed to fetch game start data:", error);
       }
@@ -77,37 +78,60 @@ const PlayView = () => {
     init();
   }, [setStatus]);
 
+  useEffect(() => {
+    if (isEndingAlertVisible) {
+      pushWindow({
+        type: "alert",
+        title: "ALERT",
+        key: "ending-alert",
+        color: colors.red,
+        content: (
+          <EndingAlert
+            onConfirm={() => {
+              useWindowStore.getState().requestCloseWindow("ending-alert");
+              setEndingAlertVisible(false);
+              showEnding();
+            }}
+          />
+        ),
+        closable: false,
+        width: 300,
+      });
+    }
+  }, [isEndingAlertVisible]);
+
   const handleStartClick = async () => {
     setGameStartVisible(false);
 
-    if (nextEvent === 1) {
-      try {
-        const { event, choices } = await getCommonEvent();
+    try {
+      const { getList: getNewsList } = useNewsStore.getState();
+      await getNewsList();
 
-        pushWindow({
-          type: "event",
-          title: event.title,
-          content: (
-            <EventEmailWindow
-              title={event.title}
-              content={event.content}
-              writer={event.writer}
-              choices={choices}
-              onChoiceSelect={handleChoiceSelect}
-              onNext={() =>
-                handleNextEvent(
-                  `event:${event.eventId}`,
-                  useEventStore.getState().nextEvent
-                )
-              }
-            />
-          ),
-          key: `event:${event.eventId}`,
-          color: colors.neon,
-        });
-      } catch (error) {
-        console.error("Failed to fetch common event:", error);
-      }
+      const { event, choices } = await getCommonEvent();
+
+      pushWindow({
+        type: "event",
+        title: event.title,
+        content: (
+          <EventEmailWindow
+            title={event.title}
+            content={event.content}
+            writer={event.writer}
+            choices={choices}
+            onChoiceSelect={handleChoiceSelect}
+            onNext={() =>
+              handleNextEvent(
+                `event:${event.eventId}`,
+                useEventStore.getState().nextEvent
+              )
+            }
+          />
+        ),
+        key: `event:${event.eventId}`,
+        color: colors.neon,
+      });
+    } catch (error) {
+      console.error("Failed to fetch common event:", error);
     }
   };
 
@@ -122,6 +146,9 @@ const PlayView = () => {
 
       setNextEvent(nextEvent);
 
+      const { getList: getEmailList } = useEmailStore.getState();
+      await getEmailList();
+
       return result;
     } catch (error) {
       console.error("선택지 전송 실패:", error);
@@ -133,20 +160,11 @@ const PlayView = () => {
     closeKey: string,
     eventType: number | null
   ) => {
-    decreaseTurn();
+    const currentTurn = useTurnStore.getState().turn;
 
-    if (eventType === 3 || turn <= 0) {
-      try {
-        requestCloseWindow(closeKey);
-        const { title, content } = await getEndingData();
-        setEnding({ title, content });
-
-        getSummary()
-          .then((res) => setSummary(res.content))
-          .catch((e) => console.error("요약 생성 실패:", e));
-      } catch (error) {
-        console.error("엔딩 데이터 로딩 실패:", error);
-      }
+    if (eventType === 3 || currentTurn <= 0) {
+      requestCloseWindow(closeKey);
+      setEndingAlertVisible(true);
       return;
     } else if (eventType === 1) {
       try {
@@ -194,6 +212,9 @@ const PlayView = () => {
         setStatus("support", userStatus.popularity);
         setNextEvent(nextEvent);
 
+        const { getList: getNewsList } = useNewsStore.getState();
+        await getNewsList();
+
         pushWindow({
           type: "event",
           title: "NEWS",
@@ -219,6 +240,19 @@ const PlayView = () => {
     }
   };
 
+  const showEnding = async () => {
+    try {
+      const { title, content } = await getEndingData();
+      setEnding({ title, content });
+
+      getSummary()
+        .then((res) => setSummary(res.content))
+        .catch((e) => console.error("요약 생성 실패:", e));
+    } catch (error) {
+      console.error("엔딩 데이터 로딩 실패:", error);
+    }
+  };
+
   return (
     <div css={playViewCss}>
       {isGameStartVisible && (
@@ -231,7 +265,7 @@ const PlayView = () => {
         </div>
       )}
 
-      {ending && !isSummaryVisible && (
+      {ending?.content && !isSummaryVisible && (
         <div css={overlayCss}>
           <GameEnding
             title={ending.title}

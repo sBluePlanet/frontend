@@ -27,11 +27,7 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
       </button>
 
       {emailList.map((email) => (
-        <div
-          key={email.eventId}
-          css={emailItemCss}
-          onClick={() => onEmailClick(email.eventId)}
-        >
+        <div css={emailItemCss} onClick={() => onEmailClick(email.id)}>
           <IoMailOpenOutline />
           <span css={titleCss}>{email.title}</span>
         </div>

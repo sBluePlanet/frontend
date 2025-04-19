@@ -11,11 +11,13 @@ export const getEmailList = async () => {
   const response = await axiosInstance.get("/data/emailList", {
     params: { userId },
   });
+  console.log(response.data);
   return response.data;
 };
 
 export const getEmailDetail = async (eventId: number) => {
   const userId = useStatusStore.getState().userId;
+  console.log(eventId);
   const response = await axiosInstance.get("/data/emailDetail", {
     params: { userId, eventId },
   });

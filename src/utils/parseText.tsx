@@ -76,6 +76,26 @@ export const parseTooltip = (
   });
 };
 
+export const parseNewLine = (text: string): ReactNode[] => {
+  const normalized = text
+    .replace(/\\n/g, "\n")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n");
+
+  const paragraphs = normalized.split(/\n{2,}/);
+
+  return paragraphs.map((paragraph, pIdx) => (
+    <p key={pIdx} style={{ marginBottom: "1.5em" }}>
+      {paragraph.split(/\n/).map((line, lIdx, arr) => (
+        <span key={lIdx}>
+          {line}
+          {lIdx !== arr.length - 1 && <br />}
+        </span>
+      ))}
+    </p>
+  ));
+};
+
 const tooltipTarget = css({
   textDecoration: `underline 2px dotted ${colors.neon}`,
   fontWeight: "bold",

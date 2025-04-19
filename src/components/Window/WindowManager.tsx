@@ -32,6 +32,7 @@ interface WindowData {
   zIndex: number;
   color?: string;
   width?: number;
+  closable?: boolean;
 }
 
 let nextId = 1;
@@ -81,6 +82,7 @@ const WindowManager = () => {
       x?: number;
       y?: number;
       width?: number;
+      closable?: boolean;
     }
   ) => {
     const windowKey = payload.key || `${type}:${payload.title}`;
@@ -169,6 +171,8 @@ const WindowManager = () => {
   };
 
   const handleEmailClick = async (emailId: number) => {
+    console.log(emailId);
+
     if (emailId === -1) {
       openWindow("email-compose", {
         key: "email-compose",

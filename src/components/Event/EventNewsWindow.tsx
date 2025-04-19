@@ -58,12 +58,12 @@ const nextButtonCss = css({
   padding: "10px 20px",
   fontSize: "16px",
   fontFamily: fonts.fixel,
-  backgroundColor: colors.dark,
+  backgroundColor: colors.red,
   color: `${colors.white}`,
   border: "none",
   cursor: "pointer",
   width: "100%",
   "&:hover": {
-    backgroundColor: colors.normal,
+    backgroundColor: colors.softRed,
   },
 });

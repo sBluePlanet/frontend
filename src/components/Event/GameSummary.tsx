@@ -6,13 +6,22 @@ interface GameSummaryProps {
 }
 
 const GameSummary = ({ content }: GameSummaryProps) => {
+  const match = content.match(/"([^"]+)"/);
+  const highlightText = match ? match[1] : "";
+
+  const restText = content
+    .replace(match?.[0] || "", "")
+    .replace(/\d+\.\s*/g, "")
+    .trim();
+
   return (
     <div css={windowCss}>
       <div css={windowTopCss}>
         <span css={titleCss}>Game Summary</span>
       </div>
       <div css={contentCss}>
-        {content}
+        <div css={highlightCss}>{highlightText}</div>
+        <div>{restText}</div>
         <button onClick={() => window.location.reload()} css={restartButtonCss}>
           RESTART
         </button>
@@ -22,6 +31,13 @@ const GameSummary = ({ content }: GameSummaryProps) => {
 };
 
 export default GameSummary;
+
+const highlightCss = css({
+  color: colors.red,
+  fontWeight: "bold",
+  marginBottom: "1em",
+  textAlign: "center",
+});
 
 const windowCss = css({
   position: "absolute",

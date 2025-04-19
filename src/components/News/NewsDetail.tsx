@@ -1,5 +1,6 @@
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
+import { parseNewLine } from "../../utils/parseText";
 
 const images = import.meta.glob("../../assets/news/*.png", {
   eager: true,
@@ -25,7 +26,7 @@ const NewsDetailWindow = ({
     <div style={{ padding: "10px" }}>
       <div css={titlsCss}>{title}</div>
       <img src={imageSrc} css={imgCss} alt="뉴스 이미지" />
-      <div css={contentCss}>{content}</div>
+      <div css={contentCss}>{parseNewLine(content)}</div>
     </div>
   );
 };

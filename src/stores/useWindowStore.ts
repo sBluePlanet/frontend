@@ -6,6 +6,10 @@ interface WindowData {
   content: React.ReactNode;
   key?: string;
   color?: string;
+  width?: number;
+  closable?: boolean;
+  x?: number;
+  y?: number;
 }
 
 export const useWindowStore = create<{
