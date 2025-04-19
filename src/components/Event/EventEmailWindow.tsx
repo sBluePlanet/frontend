@@ -4,6 +4,7 @@ import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
 import { useTooltipStore } from "../../stores/useTooltipStore";
 import { useStatusStore } from "../../stores/useStatusStore";
+import { parseTooltip, parseTooltipNewLine } from "../../utils/parseText";
 
 import { FaCloud } from "react-icons/fa";
 import { GiWaterDrop } from "react-icons/gi";
@@ -51,31 +52,6 @@ const EventEmailWindow = ({
     setResultMessage(result);
   };
 
-  const parseTextWithTooltip = (text: string) => {
-    const parts = text.split(/(\^.+?\^)/g);
-    return parts.map((part, i) => {
-      if (/^\^.+\^$/.test(part)) {
-        const word = part.replace(/\^/g, "");
-        const tooltip = tooltipData[word] || "설명이 없습니다.";
-        return (
-          <span
-            key={i}
-            css={tooltipTarget}
-            onMouseEnter={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              show(rect.left, rect.bottom + 3, tooltip);
-            }}
-            onMouseLeave={hide}
-          >
-            {word}
-          </span>
-        );
-      } else {
-        return <span key={i}>{part}</span>;
-      }
-    });
-  };
-
   return (
     <div css={wrapperCss}>
       <div css={fieldCss}>
@@ -86,42 +62,45 @@ const EventEmailWindow = ({
         <label css={labelCss}>발신자</label>
         <div css={textCss}>{writer}</div>
       </div>
-      <div css={contentCss}>{parseTextWithTooltip(content)}</div>
-
+      <div css={contentCss}>
+        {parseTooltipNewLine(content, tooltipData, show, hide)}
+      </div>
       {choices
         .filter((c) => selectedId === null || c.id === selectedId)
         .map((choice) => (
           <div key={choice.id} css={choiceBoxCss}>
             <div css={choiceCss} onClick={() => handleClick(choice.id)}>
-              {parseTextWithTooltip(choice.content)}
+              {parseTooltip(choice.content, tooltipData, show, hide)}
             </div>
           </div>
         ))}
       {resultMessage && (
         <>
-          {Object.entries(diff).map(([key, value]) => {
-            if (value === 0) return null;
+          <div css={statusLineCss}>
+            {Object.entries(diff).map(([key, value]) => {
+              if (value === 0) return null;
 
-            const isIncrease = value > 0;
-            const isLargeChange = Math.abs(value) >= 10;
+              const isIncrease = value > 0;
+              const isLargeChange = Math.abs(value) >= 10;
 
-            const ArrowIcon = isIncrease
-              ? isLargeChange
-                ? MdOutlineKeyboardDoubleArrowUp
-                : MdOutlineKeyboardArrowUp
-              : isLargeChange
-              ? MdOutlineKeyboardDoubleArrowDown
-              : MdOutlineKeyboardArrowDown;
+              const ArrowIcon = isIncrease
+                ? isLargeChange
+                  ? MdOutlineKeyboardDoubleArrowUp
+                  : MdOutlineKeyboardArrowUp
+                : isLargeChange
+                ? MdOutlineKeyboardDoubleArrowDown
+                : MdOutlineKeyboardArrowDown;
 
-            const color = isIncrease ? colors.green : colors.red;
+              const color = isIncrease ? colors.green : colors.red;
 
-            return (
-              <div key={key} css={statusLineCss}>
-                <span css={statusIconCss}>{iconMap[key]}</span>
-                <ArrowIcon color={color} size={18} />
-              </div>
-            );
-          })}
+              return (
+                <span key={key} css={statusItemCss}>
+                  <span>{iconMap[key]}</span>
+                  <ArrowIcon color={color} size={18} />
+                </span>
+              );
+            })}
+          </div>
 
           <div css={resultCss}>{resultMessage}</div>
 
@@ -167,14 +146,6 @@ const contentCss = css({
   borderTop: `1px solid ${colors.neon}`,
   fontSize: "15px",
   lineHeight: 1.8,
-});
-
-const tooltipTarget = css({
-  textDecoration: `underline 2px dotted ${colors.neon}`,
-  fontWeight: "bold",
-  color: colors.white,
-  cursor: "help",
-  margin: "0 2px",
 });
 
 const choiceBoxCss = css({
@@ -224,15 +195,17 @@ const nextButtonCss = css({
 });
 
 const statusLineCss = css({
-  borderTop: `1px solid ${colors.neon}`,
-  padding: "20px 0 0 0",
   display: "flex",
-  alignItems: "center",
   justifyContent: "center",
-  margin: "20px 0 0 0",
+  alignItems: "center",
+  gap: "20px",
+  marginTop: "20px",
+  paddingTop: "20px",
+  borderTop: `1px solid ${colors.neon}`,
 });
 
-const statusIconCss = css({
-  fontSize: "18px",
-  color: colors.white,
+const statusItemCss = css({
+  display: "flex",
+  alignItems: "center",
+  gap: "2px",
 });

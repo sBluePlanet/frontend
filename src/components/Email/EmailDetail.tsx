@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 import { useTooltipStore } from "../../stores/useTooltipStore";
 import { colors, fonts } from "../../styles/theme";
+import { parseTooltip, parseTooltipNewLine } from "../../utils/parseText";
 
 const EmailDetailWindow = ({
   title,
@@ -15,31 +16,6 @@ const EmailDetailWindow = ({
 }) => {
   const { show, hide, tooltipData } = useTooltipStore();
 
-  const parseTextWithTooltip = (text: string) => {
-    const parts = text.split(/(\^.+?\^)/g);
-    return parts.map((part, i) => {
-      if (/^\^.+\^$/.test(part)) {
-        const word = part.replace(/\^/g, "");
-        const tooltipText = tooltipData[word] || "설명이 없습니다.";
-        return (
-          <span
-            key={i}
-            css={tooltipTarget}
-            onMouseEnter={(e) => {
-              const rect = e.currentTarget.getBoundingClientRect();
-              show(rect.left, rect.bottom + 3, tooltipText);
-            }}
-            onMouseLeave={hide}
-          >
-            {word}
-          </span>
-        );
-      } else {
-        return <span key={i}>{part}</span>;
-      }
-    });
-  };
-
   return (
     <div css={wrapperCss}>
       <div css={fieldCss}>
@@ -50,10 +26,14 @@ const EmailDetailWindow = ({
         <label css={labelCss}>발신자</label>
         <div css={textCss}>{writer}</div>
       </div>
-      <div css={contentCss}>{parseTextWithTooltip(content)}</div>
+      <div css={contentCss}>
+        {parseTooltipNewLine(content, tooltipData, show, hide)}
+      </div>
 
       <div key={choice.id} css={choiceBoxCss}>
-        <div css={choiceCss}>{parseTextWithTooltip(choice.content)}</div>
+        <div css={choiceCss}>
+          {parseTooltip(choice.content, tooltipData, show, hide)}
+        </div>
       </div>
     </div>
   );
@@ -92,14 +72,6 @@ const contentCss = css({
   borderTop: `1px solid ${colors.neon}`,
   fontSize: "15px",
   lineHeight: 1.8,
-});
-
-const tooltipTarget = css({
-  textDecoration: `underline 2px dotted ${colors.white}`,
-  fontWeight: "bold",
-  color: colors.white,
-  cursor: "help",
-  margin: "0 2px",
 });
 
 const choiceBoxCss = css({

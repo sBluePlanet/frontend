@@ -36,5 +36,8 @@ export const postChoice = async (choiceId: number) => {
     userStatusId,
     choiceId,
   });
+  
+  console.log("postChoice:nextEvent: ", response.data.nextEvent);
+  console.log("userStatus:", response.data.userStatus);
   return response.data;
 };

@@ -65,7 +65,6 @@ const PlayView = () => {
         setStatus("support", userStatus.popularity);
 
         setNextEvent(nextEvent);
-        console.log("nextEvent:", nextEvent);
       } catch (error) {
         console.error("Failed to fetch game start data:", error);
       }
@@ -112,15 +111,12 @@ const PlayView = () => {
     try {
       const { userStatus, result, nextEvent } = await postChoice(choiceId);
 
-      console.log("userStatus:", userStatus);
-
       setStatus("air", userStatus.air);
       setStatus("water", userStatus.water);
       setStatus("life", userStatus.biology);
       setStatus("support", userStatus.popularity);
 
       setNextEvent(nextEvent);
-      console.log("nextEvent:", nextEvent);
 
       return result;
     } catch (error) {
@@ -139,9 +135,6 @@ const PlayView = () => {
       try {
         requestCloseWindow(closeKey);
         const { title, content } = await getEndingData();
-
-        console.log("EndingTitle:", title);
-        console.log("EndingContent:", content);
 
         setEnding({ title, content });
       } catch (error) {

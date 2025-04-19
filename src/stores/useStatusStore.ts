@@ -37,11 +37,14 @@ export const useStatusStore = create<StatusState>((set, get) => ({
     support: 50,
   },
   setStatus: (key, value) =>
-    set((state) => ({
-      ...state,
-      prev: { ...state, prev: { ...state.prev, [key]: state[key] } },
-      [key]: value,
-    })),
+    set((state) => {
+      const prevValue = state[key];
+      return {
+        ...state,
+        prev: { ...state.prev, [key]: prevValue },
+        [key]: value,
+      };
+    }),
   resetPrev: () =>
     set((state) => ({
       ...state,
