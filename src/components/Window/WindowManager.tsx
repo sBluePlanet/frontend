@@ -16,6 +16,7 @@ import {
 import { IoSettingsOutline } from "react-icons/io5";
 
 import { dummyEmails, dummyNews } from "../../dummy/dummyData";
+import EventEmailWindow from "../Event/EventEmailWindow";
 
 interface WindowData {
   id: number;
@@ -26,6 +27,7 @@ interface WindowData {
   x: number;
   y: number;
   zIndex: number;
+  color?: string;
 }
 
 let nextId = 1;
@@ -50,6 +52,7 @@ const WindowManager = () => {
       title: string;
       content: ReactNode;
       key?: string;
+      color?: string;
     }
   ) => {
     const windowKey = payload.key || `${type}:${payload.title}`;
@@ -80,6 +83,7 @@ const WindowManager = () => {
         x: centerX + offsetX,
         y: centerY + offsetY,
         zIndex: newZ,
+        color: payload.color,
       };
 
       return [...prev, newWindow];
@@ -102,6 +106,19 @@ const WindowManager = () => {
         title: "NEWS",
         content: <NewsWindow onNewsClick={handleNewsClick} />,
         key: "news",
+      }),
+    test: () =>
+      openWindow("test", {
+        title: "TEST",
+        content: (
+          <EventEmailWindow
+            title={dummyEmails[3].title}
+            content={dummyEmails[3].content}
+            writer={dummyEmails[3].writer}
+          />
+        ),
+        key: "test",
+        color: colors.red,
       }),
   };
 
@@ -158,9 +175,9 @@ const WindowManager = () => {
             <HiOutlineLightBulb size={40} />
             <div>Tips</div>
           </div>
-          <div css={desktopIconCss}>
+          <div css={desktopIconCss} onClick={() => predefinedMap["test"]?.()}>
             <IoSettingsOutline size={40} />
-            <div>Setting</div>
+            <div>Test</div>
           </div>
         </div>
 
@@ -174,6 +191,7 @@ const WindowManager = () => {
             initialY={w.y}
             onClose={() => closeWindow(w.id)}
             onClick={() => bringToFront(w.id)}
+            color={w.color}
           >
             {w.content}
           </Window>

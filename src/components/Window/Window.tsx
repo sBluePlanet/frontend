@@ -11,6 +11,7 @@ interface WindowProps {
   zIndex: number;
   onClick: () => void;
   onClose: () => void;
+  color?: string;
 }
 
 const Window = ({
@@ -22,6 +23,7 @@ const Window = ({
   zIndex,
   onClick,
   onClose,
+  color = colors.neon,
 }: WindowProps) => {
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const isDragging = useRef(false);
@@ -59,8 +61,8 @@ const Window = ({
   };
 
   return (
-    <div css={windowCss(position.x, position.y, zIndex)}>
-      <div css={windowTopCss} onMouseDown={handleMouseDown}>
+    <div css={windowCss(position.x, position.y, zIndex, color)}>
+      <div css={windowTopCss(color)} onMouseDown={handleMouseDown}>
         <span css={titleCss}>{title}</span>
         <span css={closeCss} onClick={onClose}>
           ×
@@ -73,7 +75,7 @@ const Window = ({
 
 export default Window;
 
-const windowCss = (x: number, y: number, z: number) =>
+const windowCss = (x: number, y: number, z: number, color: string) =>
   css({
     position: "absolute",
     top: y,
@@ -82,21 +84,22 @@ const windowCss = (x: number, y: number, z: number) =>
     width: "300px",
     userSelect: "none",
     backgroundColor: colors.wBackground,
-    color: "#ffffff",
+    color: colors.white,
     clipPath: "polygon(20px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 20px)",
-    border: `1px solid ${colors.neon}`,
+    border: `1px solid ${color}`,
   });
 
-const windowTopCss = css({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  cursor: "move",
-  padding: "8px 10px 8px 30px",
-  background: `linear-gradient(to right, ${colors.neon}, rgba(10, 183, 163, 0))`,
-  borderBottom: `1px solid ${colors.neon}`,
-  fontFamily: fonts.fixel,
-});
+const windowTopCss = (color: string) =>
+  css({
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    cursor: "move",
+    padding: "8px 10px 8px 30px",
+    background: `linear-gradient(to right, ${color}, rgba(10, 183, 163, 0))`,
+    borderBottom: `1px solid ${color}`,
+    fontFamily: fonts.fixel,
+  });
 
 const titleCss = css({
   color: "white",
