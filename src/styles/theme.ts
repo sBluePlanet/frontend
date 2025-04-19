@@ -4,6 +4,7 @@ export const colors = {
   neon: "#08e3c3",
   normal: "#0db89f",
   dark: "#08806e",
+  ddark: "#086c5d",
   red: "#fb3048",
   white: "#ffffff",
   black: "#000000",

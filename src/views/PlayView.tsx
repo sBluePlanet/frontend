@@ -21,7 +21,7 @@ import GameStart from "../components/Event/GameStart";
 import GameEnding from "../components/Event/GameEnding";
 import TopBar from "../components/Bar/TopBar";
 import WindowManager from "../components/Window/WindowManager";
-import TooltipLayer from "../components/TooltipLayer";
+import TooltipLayer from "../components/Guide/TooltipLayer";
 import EventEmailWindow from "../components/Event/EventEmailWindow";
 import EventNewsWindow from "../components/Event/EventNewsWindow";
 
@@ -195,7 +195,7 @@ const PlayView = () => {
         setNextEvent(nextEvent);
 
         pushWindow({
-          type: "event-news",
+          type: "event",
           title: "NEWS",
           content: (
             <EventNewsWindow

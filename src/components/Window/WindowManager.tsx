@@ -18,6 +18,7 @@ import EmailCompose from "../Email/EmailCompose";
 import NewsWindow from "../News/NewsWindow";
 import NewsDetail from "../News/NewsDetail";
 import EmailDetailWindow from "../Email/EmailDetail";
+import GuideWindow from "../Guide/GuideWindow";
 
 interface WindowData {
   id: number;
@@ -29,6 +30,7 @@ interface WindowData {
   y: number;
   zIndex: number;
   color?: string;
+  width?: number;
 }
 
 let nextId = 1;
@@ -38,6 +40,12 @@ const WindowManager = () => {
 
   const { openWindowQueue, clearWindowQueue } = useWindowStore();
   const { closeWindowQueue, clearCloseQueue } = useWindowStore();
+
+  useEffect(() => {
+    predefinedMap.email();
+    predefinedMap.news();
+    predefinedMap.guide();
+  }, []);
 
   useEffect(() => {
     if (openWindowQueue.length > 0) {
@@ -69,6 +77,9 @@ const WindowManager = () => {
       content: ReactNode;
       key?: string;
       color?: string;
+      x?: number;
+      y?: number;
+      width?: number;
     }
   ) => {
     const windowKey = payload.key || `${type}:${payload.title}`;
@@ -84,17 +95,17 @@ const WindowManager = () => {
 
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
-      const centerX = screenWidth / 2 - 150;
+      const centerX = screenWidth / 2 - 190;
       const centerY = screenHeight / 2 - 350;
 
       const isEvent = type === "event";
 
-      const x = isEvent
-        ? centerX
-        : centerX + Math.floor(Math.random() * 100 - 50);
-      const y = isEvent
-        ? centerY
-        : centerY + Math.floor(Math.random() * 100 - 50);
+      const x =
+        payload.x ??
+        (isEvent ? centerX : centerX + Math.floor(Math.random() * 100 - 50));
+      const y =
+        payload.y ??
+        (isEvent ? centerY : centerY + Math.floor(Math.random() * 100 - 50));
 
       const newWindow: WindowData = {
         id: nextId++,
@@ -106,6 +117,7 @@ const WindowManager = () => {
         y,
         zIndex: newZ,
         color: payload.color,
+        width: payload.width,
       };
 
       return [...prev, newWindow];
@@ -122,6 +134,9 @@ const WindowManager = () => {
         title: "E-MAIL",
         content: <EmailWindow onEmailClick={handleEmailClick} />,
         key: "email",
+        x: 300,
+        y: 100,
+        width: 400,
       }),
     news: () =>
       openWindow("news", {
@@ -129,6 +144,18 @@ const WindowManager = () => {
         content: <NewsWindow onNewsClick={handleNewsClick} />,
         key: "news",
         color: colors.red,
+        x: 200,
+        y: 400,
+        width: 300,
+      }),
+    guide: () =>
+      openWindow("guide", {
+        title: "GUIDE",
+        content: <GuideWindow />,
+        key: "guide",
+        color: colors.red,
+        x: window.innerWidth - 600,
+        y: window.innerHeight - 700,
       }),
   };
 
@@ -195,9 +222,9 @@ const WindowManager = () => {
             <HiOutlineNewspaper size={40} />
             <div>News</div>
           </div>
-          <div css={desktopIconCss}>
+          <div css={desktopIconCss} onClick={() => predefinedMap["guide"]?.()}>
             <HiOutlineLightBulb size={40} />
-            <div>Tips</div>
+            <div>Guide</div>
           </div>
           <div css={desktopIconCss}>
             <IoSettingsOutline size={40} />
@@ -216,6 +243,8 @@ const WindowManager = () => {
             onClose={() => closeWindow(w.id)}
             onClick={() => bringToFront(w.id)}
             color={w.color}
+            width={w.width}
+            closable={w.type !== "event"}
           >
             {w.content}
           </Window>

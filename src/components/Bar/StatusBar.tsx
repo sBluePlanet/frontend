@@ -52,7 +52,7 @@ const Gauge = ({ icon, value }: GaugeProps) => {
   return (
     <div css={gaugeCss}>
       <span css={iconCss}>{icon}</span>
-      <div css={gaugeBarCss(color)}>
+      <div css={gaugeBarCss}>
         <div css={fillCss(value, color)} />
       </div>
     </div>
@@ -61,7 +61,7 @@ const Gauge = ({ icon, value }: GaugeProps) => {
 
 const statusBarCss = css({
   display: "flex",
-  gap: "50px",
+  gap: "30px",
   alignItems: "center",
   fontSize: "14px",
 });
@@ -69,23 +69,21 @@ const statusBarCss = css({
 const gaugeCss = css({
   display: "flex",
   alignItems: "center",
-  gap: "6px",
+  gap: "5px",
 });
 
 const iconCss = css({
   fontSize: "20px",
-  marginRight: "8px",
   color: colors.neon,
 });
 
-const gaugeBarCss = (color: string) =>
+const gaugeBarCss = () =>
   css({
-    width: "80px",
+    width: "100px",
     height: "15px",
-    backgroundColor: colors.wBackground,
-    boxShadow: `0 0 6px ${color}`,
+    backgroundColor: colors.ddark,
     overflow: "hidden",
-    clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
+    clipPath: "polygon(10px 0%, 100% 0%, 90px 100%, 0% 100%)",
     transition: "background-color 0.5s ease",
   });
 

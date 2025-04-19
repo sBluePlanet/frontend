@@ -1,8 +1,20 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { css } from "@emotion/react";
 
 import { colors, fonts } from "../../styles/theme";
 import { useTooltipStore } from "../../stores/useTooltipStore";
+import { useStatusStore } from "../../stores/useStatusStore";
+
+import { FaCloud } from "react-icons/fa";
+import { GiWaterDrop } from "react-icons/gi";
+import { FaHeartbeat } from "react-icons/fa";
+import { FaPerson } from "react-icons/fa6";
+import {
+  MdOutlineKeyboardArrowUp,
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardDoubleArrowUp,
+  MdOutlineKeyboardDoubleArrowDown,
+} from "react-icons/md";
 
 const EventEmailWindow = ({
   title,
@@ -21,8 +33,16 @@ const EventEmailWindow = ({
 }) => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
+  const diff = useStatusStore.getState().getDiff();
 
   const { show, hide, tooltipData } = useTooltipStore();
+
+  const iconMap: Record<string, ReactNode> = {
+    air: <FaCloud />,
+    water: <GiWaterDrop />,
+    life: <FaHeartbeat />,
+    support: <FaPerson />,
+  };
 
   const handleClick = async (choiceId: number) => {
     if (selectedId !== null) return;
@@ -79,7 +99,32 @@ const EventEmailWindow = ({
         ))}
       {resultMessage && (
         <>
+          {Object.entries(diff).map(([key, value]) => {
+            if (value === 0) return null;
+
+            const isIncrease = value > 0;
+            const isLargeChange = Math.abs(value) >= 10;
+
+            const ArrowIcon = isIncrease
+              ? isLargeChange
+                ? MdOutlineKeyboardDoubleArrowUp
+                : MdOutlineKeyboardArrowUp
+              : isLargeChange
+              ? MdOutlineKeyboardDoubleArrowDown
+              : MdOutlineKeyboardArrowDown;
+
+            const color = isIncrease ? colors.green : colors.red;
+
+            return (
+              <div key={key} css={statusLineCss}>
+                <span css={statusIconCss}>{iconMap[key]}</span>
+                <ArrowIcon color={color} size={18} />
+              </div>
+            );
+          })}
+
           <div css={resultCss}>{resultMessage}</div>
+
           <button css={nextButtonCss} onClick={onNext}>
             next
           </button>
@@ -156,9 +201,7 @@ const choiceCss = css({
 });
 
 const resultCss = css({
-  marginTop: "15px",
-  padding: "20px 16px",
-  borderTop: `1px solid ${colors.neon}`,
+  padding: "10px 16px 30px 16px",
   color: colors.neon,
   fontSize: "15px",
   fontFamily: fonts.gothic,
@@ -178,4 +221,18 @@ const nextButtonCss = css({
   "&:hover": {
     backgroundColor: colors.normal,
   },
+});
+
+const statusLineCss = css({
+  borderTop: `1px solid ${colors.neon}`,
+  padding: "20px 0 0 0",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  margin: "20px 0 0 0",
+});
+
+const statusIconCss = css({
+  fontSize: "18px",
+  color: colors.white,
 });
