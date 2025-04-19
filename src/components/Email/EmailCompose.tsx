@@ -1,7 +1,55 @@
+import { useState } from "react";
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
+import { getAdvice } from "../../api/gptApi";
+import { useWindowStore } from "../../stores/useWindowStore";
+import EmailDetailWindow from "../Email/EmailDetail";
+import { useEventStore } from "../../stores/useEventStore";
+import EmailWaitingWindow from "../Email/EmailWaiting";
 
 const EmailCompose = () => {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const pushWindow = useWindowStore((state) => state.pushWindow);
+  const eventId = useEventStore((state) => state.eventId);
+
+  const handleSend = async () => {
+    if (!title || !content) return;
+    if (eventId === null) return;
+
+    const waitingKey = `waiting:${Date.now()}`;
+
+    try {
+      useWindowStore.getState().requestCloseWindow("email-compose");
+
+      pushWindow({
+        type: "email-wait",
+        key: waitingKey,
+        title: `RE: ${title}`,
+        content: <EmailWaitingWindow />,
+        color: colors.neon,
+      });
+
+      const res = await getAdvice(eventId, title, content);
+      useWindowStore.getState().requestCloseWindow(waitingKey);
+
+      pushWindow({
+        type: "email-detail",
+        key: `advice:${Date.now()}`,
+        title: `RE: ${title}`,
+        content: (
+          <EmailDetailWindow
+            title={`RE: ${title}`}
+            content={res.content}
+            writer="과학자 어쩌고"
+          />
+        ),
+      });
+    } catch (err) {
+      console.error("Advice 요청 실패:", err);
+    }
+  };
+
   return (
     <div css={composeCss}>
       <div css={fieldCss}>
@@ -10,10 +58,22 @@ const EmailCompose = () => {
       </div>
       <div css={fieldCss}>
         <label css={labelCss}>제목</label>
-        <input css={inputCss} placeholder="제목을 입력하세요" />
+        <input
+          css={inputCss}
+          placeholder="제목을 입력하세요"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
-      <textarea css={textareaCss} placeholder="내용을 입력하세요" />
-      <button css={sendBtnCss}>보내기 (3/3)</button>
+      <textarea
+        css={textareaCss}
+        placeholder="내용을 입력하세요"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
+      <button css={sendBtnCss} onClick={handleSend}>
+        보내기 (3/3)
+      </button>
     </div>
   );
 };

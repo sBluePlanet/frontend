@@ -12,7 +12,7 @@ const EmailDetailWindow = ({
   title: string;
   content: string;
   writer: string;
-  choice: { id: number; content: string };
+  choice?: { id: number; content: string };
 }) => {
   const { show, hide, tooltipData } = useTooltipStore();
 
@@ -30,11 +30,13 @@ const EmailDetailWindow = ({
         {parseTooltipNewLine(content, tooltipData, show, hide)}
       </div>
 
-      <div key={choice.id} css={choiceBoxCss}>
-        <div css={choiceCss}>
-          {parseTooltip(choice.content, tooltipData, show, hide)}
+      {choice && (
+        <div key={choice.id} css={choiceBoxCss}>
+          <div css={choiceCss}>
+            {parseTooltip(choice.content, tooltipData, show, hide)}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

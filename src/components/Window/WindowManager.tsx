@@ -19,6 +19,7 @@ import NewsWindow from "../News/NewsWindow";
 import NewsDetail from "../News/NewsDetail";
 import EmailDetailWindow from "../Email/EmailDetail";
 import GuideWindow from "../Guide/GuideWindow";
+import SystemWindow from "../Guide/SystemWindow";
 
 interface WindowData {
   id: number;
@@ -157,6 +158,14 @@ const WindowManager = () => {
         x: window.innerWidth - 600,
         y: window.innerHeight - 700,
       }),
+    system: () =>
+      openWindow("system", {
+        title: "System",
+        content: <SystemWindow />,
+        key: "system",
+        color: colors.red,
+        width: 300,
+      }),
   };
 
   const handleEmailClick = async (emailId: number) => {
@@ -226,9 +235,9 @@ const WindowManager = () => {
             <HiOutlineLightBulb size={40} />
             <div>Guide</div>
           </div>
-          <div css={desktopIconCss}>
+          <div css={desktopIconCss} onClick={() => predefinedMap["system"]?.()}>
             <IoSettingsOutline size={40} />
-            <div>Test</div>
+            <div>System</div>
           </div>
         </div>
 

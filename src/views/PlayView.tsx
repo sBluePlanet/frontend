@@ -16,6 +16,7 @@ import {
   getEndingData,
 } from "../api/gameApi";
 import { getTooltips } from "../api/dataApi";
+import { getSummary } from "../api/gptApi";
 
 import GameStart from "../components/Event/GameStart";
 import GameEnding from "../components/Event/GameEnding";
@@ -24,6 +25,7 @@ import WindowManager from "../components/Window/WindowManager";
 import TooltipLayer from "../components/Guide/TooltipLayer";
 import EventEmailWindow from "../components/Event/EventEmailWindow";
 import EventNewsWindow from "../components/Event/EventNewsWindow";
+import GameSummary from "../components/Event/GameSummary";
 
 const PlayView = () => {
   const [isGameStartVisible, setGameStartVisible] = useState(true);
@@ -32,6 +34,8 @@ const PlayView = () => {
     title: string;
     content: string;
   } | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [isSummaryVisible, setSummaryVisible] = useState(false);
 
   const setUserId = useStatusStore((state) => state.setUserId);
   const setStatus = useStatusStore((state) => state.setStatus);
@@ -135,8 +139,11 @@ const PlayView = () => {
       try {
         requestCloseWindow(closeKey);
         const { title, content } = await getEndingData();
-
         setEnding({ title, content });
+
+        getSummary()
+          .then((res) => setSummary(res.content))
+          .catch((e) => console.error("요약 생성 실패:", e));
       } catch (error) {
         console.error("엔딩 데이터 로딩 실패:", error);
       }
@@ -224,13 +231,23 @@ const PlayView = () => {
         </div>
       )}
 
-      {ending && (
+      {ending && !isSummaryVisible && (
         <div css={overlayCss}>
           <GameEnding
             title={ending.title}
             content={ending.content}
-            onRestartClick={() => window.location.reload()}
+            onClick={() => setSummaryVisible(true)}
           />
+        </div>
+      )}
+
+      {ending && isSummaryVisible && (
+        <div css={overlayCss}>
+          {summary ? (
+            <GameSummary content={summary} />
+          ) : (
+            <div css={loadingCss}>요약을 생성하는 중입니다...</div>
+          )}
         </div>
       )}
 
@@ -272,4 +289,11 @@ const overlayCss = css({
   justifyContent: "center",
   alignItems: "center",
   zIndex: 9999,
+});
+
+const loadingCss = css({
+  color: "white",
+  fontSize: "20px",
+  textAlign: "center",
+  padding: "50px",
 });

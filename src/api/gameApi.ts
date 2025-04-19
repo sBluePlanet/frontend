@@ -1,5 +1,6 @@
 import axiosInstance from "./axiosInstance";
 import { useStatusStore } from "../stores/useStatusStore";
+import { useEventStore } from "../stores/useEventStore";
 
 export const getStartData = async () => {
   const response = await axiosInstance.get("/game/start");
@@ -19,6 +20,8 @@ export const getCommonEvent = async () => {
   const response = await axiosInstance.get("/game/common", {
     params: { userId },
   });
+  const { event } = response.data;
+  useEventStore.getState().setEventId(event.eventId);
   return response.data;
 };
 
@@ -36,7 +39,7 @@ export const postChoice = async (choiceId: number) => {
     userStatusId,
     choiceId,
   });
-  
+
   console.log("postChoice:nextEvent: ", response.data.nextEvent);
   console.log("userStatus:", response.data.userStatus);
   return response.data;

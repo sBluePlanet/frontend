@@ -1,42 +1,27 @@
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
 
-interface GameEndingProps {
-  onClick: () => void;
-  title: string;
+interface GameSummaryProps {
   content: string;
 }
 
-const GameEnding = ({ onClick, title, content }: GameEndingProps) => {
+const GameSummary = ({ content }: GameSummaryProps) => {
   return (
     <div css={windowCss}>
       <div css={windowTopCss}>
-        <span css={titleCss}>{title}</span>
+        <span css={titleCss}>Game Summary</span>
       </div>
       <div css={contentCss}>
-        {content
-          .replace(/\r\n/g, "\n")
-          .replace(/\r/g, "\n")
-          .split(/\n{2,}/)
-          .map((paragraph, i) => (
-            <p key={i} style={{ marginBottom: "1.5em" }}>
-              {paragraph.split(/\n/).map((line, j) => (
-                <span key={j}>
-                  {line}
-                  {j !== paragraph.split(/\n/).length - 1 && <br />}
-                </span>
-              ))}
-            </p>
-          ))}
-        <button onClick={onClick} css={restartButtonCss}>
-          플레이 요약
+        {content}
+        <button onClick={() => window.location.reload()} css={restartButtonCss}>
+          RESTART
         </button>
       </div>
     </div>
   );
 };
 
-export default GameEnding;
+export default GameSummary;
 
 const windowCss = css({
   position: "absolute",
