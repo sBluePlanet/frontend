@@ -1,17 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
 import { parseNewLine } from "../../utils/parseText";
+
+const images = import.meta.glob("../../assets/ending/*.png", {
+  eager: true,
+  import: "default",
+});
+
+const getImageByFilename = (filename: string): string => {
+  return images[`../../assets/ending/${filename}`] as string;
+};
 
 interface GameEndingProps {
   onClick: () => void;
   title: string;
   content: string;
+  imgUrl: string;
 }
 
-const GameEnding = ({ onClick, title, content }: GameEndingProps) => {
+const GameEnding = ({ onClick, title, content, imgUrl }: GameEndingProps) => {
   const [typingText, setTypingText] = useState("");
   const [isTypingDone, setIsTypingDone] = useState(false);
+  const scrollWrapperRef = useRef<HTMLDivElement>(null);
+
+  const imageSrc = getImageByFilename(imgUrl);
 
   useEffect(() => {
     let i = 0;
@@ -27,13 +40,26 @@ const GameEnding = ({ onClick, title, content }: GameEndingProps) => {
     return () => clearInterval(interval);
   }, [content]);
 
+  useEffect(() => {
+    if (scrollWrapperRef.current) {
+      scrollWrapperRef.current.scrollTop =
+        scrollWrapperRef.current.scrollHeight;
+    }
+  }, [typingText]);
+
   return (
     <div css={windowCss}>
       <div css={windowTopCss}>
         <span css={titleCss}>{title}</span>
       </div>
       <div css={contentCss}>
-        {parseNewLine(typingText)}
+        <div css={contentRowCss}>
+          <img src={imageSrc} alt="엔딩 이미지" css={imgCss} />
+          <div css={scrollWrapperCss} ref={scrollWrapperRef}>
+            <div css={textCss}>{parseNewLine(typingText)}</div>
+          </div>
+        </div>
+
         {isTypingDone && (
           <button onClick={onClick} css={restartButtonCss}>
             당신은…
@@ -48,7 +74,7 @@ export default GameEnding;
 
 const windowCss = css({
   position: "absolute",
-  width: "500px",
+  width: "800px",
   userSelect: "none",
   backgroundColor: colors.wBackground,
   color: colors.white,
@@ -78,13 +104,46 @@ const contentCss = css({
   lineHeight: "1.5",
 });
 
+const contentRowCss = css({
+  display: "flex",
+  gap: "20px",
+  maxHeight: "400px",
+});
+
+const imgCss = css({
+  width: "400px",
+  height: "400px",
+});
+
+const scrollWrapperCss = css({
+  flex: 1,
+  overflow: "auto",
+  paddingRight: "8px",
+  scrollbarWidth: "thin",
+  scrollbarColor: `${colors.red} transparent`,
+  "&::-webkit-scrollbar": {
+    width: "8px",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: colors.red,
+    borderRadius: "4px",
+    border: "2px solid transparent",
+    backgroundClip: "content-box",
+  },
+});
+
+const textCss = css({
+  lineHeight: 1.7,
+  whiteSpace: "pre-wrap",
+});
+
 const restartButtonCss = css({
-  marginTop: "20px",
+  marginTop: "16px",
   padding: "10px 20px",
   fontSize: "16px",
   fontFamily: fonts.fixel,
   backgroundColor: colors.red,
-  color: `${colors.white}`,
+  color: colors.white,
   border: "none",
   cursor: "pointer",
   width: "100%",

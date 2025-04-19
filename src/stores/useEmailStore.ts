@@ -4,6 +4,7 @@ import { getEmailList } from "../api/dataApi";
 interface Email {
   id: number;
   title: string;
+  type: string;
 }
 
 interface EmailStore {

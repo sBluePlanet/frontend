@@ -36,6 +36,7 @@ const PlayView = () => {
   const [ending, setEnding] = useState<{
     title: string;
     content: string;
+    imgUrl: string;
   } | null>(null);
   const [summary, setSummary] = useState<string | null>(null);
   const [isSummaryVisible, setSummaryVisible] = useState(false);
@@ -244,8 +245,8 @@ const PlayView = () => {
 
   const showEnding = async () => {
     try {
-      const { title, content } = await getEndingData();
-      setEnding({ title, content });
+      const { title, content, imgUrl } = await getEndingData();
+      setEnding({ title, content, imgUrl });
 
       getSummary()
         .then((res) => setSummary(res.content))
@@ -273,6 +274,7 @@ const PlayView = () => {
             title={ending.title}
             content={ending.content}
             onClick={() => setSummaryVisible(true)}
+            imgUrl={ending.imgUrl}
           />
         </div>
       )}

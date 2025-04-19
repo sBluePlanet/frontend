@@ -170,7 +170,7 @@ const WindowManager = () => {
       }),
   };
 
-  const handleEmailClick = async (emailId: number) => {
+  const handleEmailClick = async (emailId: number, type: string) => {
     console.log(emailId);
 
     if (emailId === -1) {
@@ -183,7 +183,7 @@ const WindowManager = () => {
     }
 
     try {
-      const email = await getEmailDetail(emailId);
+      const email = await getEmailDetail(emailId, type);
 
       openWindow("email-detail", {
         key: `email-detail:${emailId}`,

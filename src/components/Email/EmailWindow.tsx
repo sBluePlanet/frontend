@@ -6,7 +6,7 @@ import { IoMailOpenOutline } from "react-icons/io5";
 import { useEmailStore } from "../../stores/useEmailStore";
 
 interface EmailWindowProps {
-  onEmailClick: (emailId: number) => void;
+  onEmailClick: (emailId: number, type:string) => void;
 }
 
 const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
@@ -17,7 +17,7 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
   }, []);
 
   const handleComposeClick = () => {
-    onEmailClick(-1);
+    onEmailClick(-1, "");
   };
 
   return (
@@ -27,7 +27,7 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
       </button>
 
       {emailList.map((email) => (
-        <div css={emailItemCss} onClick={() => onEmailClick(email.id)}>
+        <div css={emailItemCss} onClick={() => onEmailClick(email.id, email.type)}>
           <IoMailOpenOutline />
           <span css={titleCss}>{email.title}</span>
         </div>
