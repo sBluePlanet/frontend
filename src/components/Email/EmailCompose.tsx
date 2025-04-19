@@ -107,6 +107,7 @@ const sendBtnCss = css({
   color: colors.white,
   fontFamily: fonts.fixel,
   cursor: "pointer",
+  border: "none",
   "&:hover": {
     backgroundColor: colors.dark,
   },

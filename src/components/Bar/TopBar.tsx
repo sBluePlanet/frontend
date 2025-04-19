@@ -33,13 +33,13 @@ const topBarCss = css({
 });
 
 const bigNumberCss = css({
-  fontSize: "20px",
+  fontSize: "25px",
   fontWeight: "bold",
   marginRight: "2px",
   color: colors.red,
 });
 
 const smallNumberCss = css({
-  fontSize: "12px",
+  fontSize: "15px",
   opacity: 0.7,
 });
