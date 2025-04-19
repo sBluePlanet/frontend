@@ -36,9 +36,9 @@ const Gauge = ({ icon, value }: GaugeProps) => {
   useEffect(() => {
     const prev = prevValueRef.current;
     if (value > prev) {
-      setColor(colors.red);
-    } else if (value < prev) {
       setColor(colors.green);
+    } else if (value < prev) {
+      setColor(colors.red);
     }
     prevValueRef.current = value;
 
@@ -53,7 +53,7 @@ const Gauge = ({ icon, value }: GaugeProps) => {
     <div css={gaugeCss}>
       <span css={iconCss}>{icon}</span>
       <div css={gaugeBarCss(color)}>
-        <div css={fillCss(value)} />
+        <div css={fillCss(value, color)} />
       </div>
     </div>
   );
@@ -82,17 +82,17 @@ const gaugeBarCss = (color: string) =>
   css({
     width: "80px",
     height: "15px",
-    backgroundColor: `${color}cc`,
+    backgroundColor: colors.wBackground,
     boxShadow: `0 0 6px ${color}`,
     overflow: "hidden",
     clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
     transition: "background-color 0.5s ease",
   });
 
-const fillCss = (value: number) =>
+const fillCss = (value: number, color: string) =>
   css({
     width: `${value}%`,
     height: "100%",
-    backgroundColor: colors.wBackground,
+    backgroundColor: `${color}cc`,
     transition: "width 0.3s ease",
   });

@@ -53,8 +53,6 @@ const PlayView = () => {
         const tooltips = await getTooltips();
         useTooltipStore.getState().setTooltipData(tooltips);
 
-        console.log("tooltips:", tooltips);
-
         setPrologue({
           title: prologue.title,
           content: prologue.content,
@@ -113,6 +111,8 @@ const PlayView = () => {
   const handleChoiceSelect = async (choiceId: number): Promise<string> => {
     try {
       const { userStatus, result, nextEvent } = await postChoice(choiceId);
+
+      console.log("userStatus:", userStatus);
 
       setStatus("air", userStatus.air);
       setStatus("water", userStatus.water);

@@ -12,10 +12,11 @@ interface WindowProps {
   onClick: () => void;
   onClose: () => void;
   color?: string;
+  width?: string | number;
+  closable?: boolean;
 }
 
 const Window = ({
-  // id,
   title,
   children,
   initialX,
@@ -24,6 +25,8 @@ const Window = ({
   onClick,
   onClose,
   color = colors.neon,
+  width = "400px",
+  closable = true,
 }: WindowProps) => {
   const [position, setPosition] = useState({ x: initialX, y: initialY });
   const isDragging = useRef(false);
@@ -65,12 +68,14 @@ const Window = ({
   };
 
   return (
-    <div css={windowCss(position.x, position.y, zIndex, color)}>
+    <div css={windowCss(position.x, position.y, zIndex, color, width)}>
       <div css={windowTopCss(color)} onMouseDown={handleMouseDown}>
         <span css={titleCss}>{title}</span>
-        <span css={closeCss} onClick={onClose}>
-          ×
-        </span>
+        {closable && (
+          <span css={closeCss} onClick={onClose}>
+            ×
+          </span>
+        )}
       </div>
       <div css={contentCss}>{children}</div>
     </div>
@@ -79,13 +84,19 @@ const Window = ({
 
 export default Window;
 
-const windowCss = (x: number, y: number, z: number, color: string) =>
+const windowCss = (
+  x: number,
+  y: number,
+  z: number,
+  color: string,
+  width: string | number
+) =>
   css({
     position: "absolute",
     top: y,
     left: x,
     zIndex: z,
-    width: "400px",
+    width: typeof width === "number" ? `${width}px` : width,
     userSelect: "none",
     backgroundColor: colors.wBackground,
     color: colors.white,
@@ -115,6 +126,22 @@ const titleCss = css({
 const contentCss = css({
   padding: "10px",
   lineHeight: "1.5",
+  maxHeight: "600px",
+  overflow: "auto",
+  scrollbarWidth: "thin",
+  scrollbarColor: `${colors.normal} transparent`,
+  "&::-webkit-scrollbar": {
+    width: "8px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "transparent",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: colors.normal,
+    borderRadius: "4px",
+    border: "2px solid transparent",
+    backgroundClip: "content-box",
+  },
 });
 
 const closeCss = css({

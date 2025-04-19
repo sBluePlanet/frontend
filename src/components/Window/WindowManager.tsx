@@ -85,7 +85,7 @@ const WindowManager = () => {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
       const centerX = screenWidth / 2 - 150;
-      const centerY = screenHeight / 2 - 250;
+      const centerY = screenHeight / 2 - 350;
 
       const isEvent = type === "event";
 
