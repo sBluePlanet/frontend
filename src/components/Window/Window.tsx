@@ -30,6 +30,10 @@ const Window = ({
   const offset = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
+    setPosition({ x: initialX, y: initialY });
+  }, [initialX, initialY]);
+
+  useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       setPosition({
@@ -81,7 +85,7 @@ const windowCss = (x: number, y: number, z: number, color: string) =>
     top: y,
     left: x,
     zIndex: z,
-    width: "300px",
+    width: "400px",
     userSelect: "none",
     backgroundColor: colors.wBackground,
     color: colors.white,

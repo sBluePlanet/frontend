@@ -1,19 +1,37 @@
+import { useState } from "react";
 import { css } from "@emotion/react";
+
+import { colors, fonts } from "../../styles/theme";
 import { dummyTooltip } from "../../dummy/dummyData";
 import { useTooltipStore } from "../../stores/useTooltipStore";
-import { colors, fonts } from "../../styles/theme";
 
 const EventEmailWindow = ({
   title,
   content,
   writer,
+  choices,
+  onChoiceSelect,
+  onNext,
 }: {
   title: string;
   content: string;
   writer: string;
+  choices: { id: number; content: string }[];
+  onChoiceSelect: (choiceId: number) => Promise<string>;
+  onNext: () => void;
 }) => {
   const { show, hide } = useTooltipStore();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
+
   const parts = content.split(/(\^.+?\^)/g);
+
+  const handleClick = async (choiceId: number) => {
+    if (selectedId !== null) return;
+    setSelectedId(choiceId);
+    const result = await onChoiceSelect(choiceId);
+    setResultMessage(result);
+  };
 
   return (
     <div css={wrapperCss}>
@@ -47,6 +65,24 @@ const EventEmailWindow = ({
           }
         })}
       </div>
+
+      {choices
+        .filter((c) => selectedId === null || c.id === selectedId)
+        .map((choice) => (
+          <div key={choice.id} css={choiceBoxCss}>
+            <div css={choiceCss} onClick={() => handleClick(choice.id)}>
+              {choice.content}
+            </div>
+          </div>
+        ))}
+      {resultMessage && (
+        <>
+          <div css={resultCss}>{resultMessage}</div>
+          <button css={nextButtonCss} onClick={onNext}>
+            next
+          </button>
+        </>
+      )}
     </div>
   );
 };
@@ -65,7 +101,7 @@ const fieldCss = css({
 
 const labelCss = css({
   fontSize: "13px",
-  color: colors.red,
+  color: colors.neon,
   marginRight: "8px",
   width: "40px",
   textAlign: "right",
@@ -81,7 +117,7 @@ const textCss = css({
 const contentCss = css({
   marginTop: "15px",
   padding: "10px",
-  borderTop: `1px solid ${colors.red}`,
+  borderTop: `1px solid ${colors.neon}`,
   fontSize: "15px",
   lineHeight: 1.8,
 });
@@ -92,4 +128,52 @@ const tooltipTarget = css({
   color: colors.white,
   cursor: "help",
   margin: "0 2px",
+});
+
+const choiceBoxCss = css({
+  display: "flex",
+  justifyContent: "flex-end",
+});
+
+const choiceCss = css({
+  color: colors.white,
+  fontFamily: fonts.fixel,
+  fontSize: "14px",
+  padding: "12px 20px",
+  borderRadius: "15px 15px 0px 15px",
+  border: `1px solid ${colors.neon}`,
+  maxWidth: "70%",
+  alignSelf: "flex-end",
+  backgroundColor: colors.dark,
+
+  margin: "8px 0",
+  "&:hover": {
+    backgroundColor: colors.wBackground,
+    cursor: "pointer",
+  },
+});
+
+const resultCss = css({
+  marginTop: "15px",
+  padding: "20px 16px",
+  borderTop: `1px solid ${colors.neon}`,
+  color: colors.neon,
+  fontSize: "15px",
+  fontFamily: fonts.gothic,
+  fontStyle: "italic",
+  textAlign: "center",
+});
+
+const nextButtonCss = css({
+  padding: "10px 20px",
+  fontSize: "16px",
+  fontFamily: fonts.fixel,
+  backgroundColor: colors.dark,
+  color: `${colors.white}`,
+  border: "none",
+  cursor: "pointer",
+  width: "100%",
+  "&:hover": {
+    backgroundColor: colors.normal,
+  },
 });

@@ -1,7 +1,8 @@
+import { useEffect, useRef, useState, ReactNode } from "react";
 import { css } from "@emotion/react";
+
 import { colors } from "../../styles/theme";
 import { useStatusStore } from "../../stores/useStatusStore";
-import { ReactNode } from "react";
 
 import { FaCloud } from "react-icons/fa";
 import { GiWaterDrop } from "react-icons/gi";
@@ -29,10 +30,29 @@ interface GaugeProps {
 }
 
 const Gauge = ({ icon, value }: GaugeProps) => {
+  const prevValueRef = useRef<number>(value);
+  const [color, setColor] = useState(colors.neon);
+
+  useEffect(() => {
+    const prev = prevValueRef.current;
+    if (value > prev) {
+      setColor(colors.red);
+    } else if (value < prev) {
+      setColor(colors.white);
+    }
+    prevValueRef.current = value;
+
+    const timer = setTimeout(() => {
+      setColor(colors.neon);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [value]);
+
   return (
     <div css={gaugeCss}>
       <span css={iconCss}>{icon}</span>
-      <div css={gaugeBarCss}>
+      <div css={gaugeBarCss(color)}>
         <div css={fillCss(value)} />
       </div>
     </div>
@@ -58,13 +78,14 @@ const iconCss = css({
   color: colors.neon,
 });
 
-const gaugeBarCss = css({
-  width: "80px",
-  height: "15px",
-  backgroundColor: colors.neon,
-  overflow: "hidden",
-  clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
-});
+const gaugeBarCss = (color: string) =>
+  css({
+    width: "80px",
+    height: "15px",
+    backgroundColor: color,
+    overflow: "hidden",
+    clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
+  });
 
 const fillCss = (value: number) =>
   css({

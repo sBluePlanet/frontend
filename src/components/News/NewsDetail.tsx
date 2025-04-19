@@ -21,7 +21,7 @@ export default NewsDetailWindow;
 const titlsCss = css({
   fontFamily: fonts.fixel,
   fontSize: "18px",
-  borderBottom: `1px solid ${colors.neon}`,
+  borderBottom: `1px solid ${colors.red}`,
   marginBottom: "15px",
 });
 

@@ -1,13 +1,21 @@
+import { useEffect } from "react";
 import { css } from "@emotion/react";
-import { dummyEmails } from "../../dummy/dummyData";
-import { IoMailOpenOutline } from "react-icons/io5";
 import { colors, fonts } from "../../styles/theme";
+
+import { IoMailOpenOutline } from "react-icons/io5";
+import { useEmailStore } from "../../stores/useEmailStore";
 
 interface EmailWindowProps {
   onEmailClick: (emailId: number) => void;
 }
 
 const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
+  const { emailList, getList } = useEmailStore();
+
+  useEffect(() => {
+    getList();
+  }, []);
+
   const handleComposeClick = () => {
     onEmailClick(-1);
   };
@@ -18,11 +26,11 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
         조언가에게 이메일 작성
       </button>
 
-      {dummyEmails.map((email) => (
+      {emailList.map((email) => (
         <div
-          key={email.id}
+          key={email.eventId}
           css={emailItemCss}
-          onClick={() => onEmailClick(email.id)}
+          onClick={() => onEmailClick(email.eventId)}
         >
           <IoMailOpenOutline />
           <span css={titleCss}>{email.title}</span>

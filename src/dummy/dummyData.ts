@@ -1,3 +1,8 @@
+export const dummyStart = {
+  content:
+    "환경 문제에 대한 여정을 시작합니다. 여러 이벤트를 통해 환경에 긍정적인 변화를 가져오는 선택을 하게 될 것입니다.",
+};
+
 export const dummyEmails = [
   {
     id: 1,

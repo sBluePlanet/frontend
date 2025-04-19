@@ -1,13 +1,7 @@
-import { useState, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { css } from "@emotion/react";
-import { colors, fonts } from "../../styles/theme";
 
-import Window from "./Window";
-import EmailWindow from "../Email/EmailWindow";
-import EmailDetail from "../Email/EmailDetail";
-import EmailCompose from "../Email/EmailCompose";
-import NewsWindow from "../News/NewsWindow";
-import NewsDetail from "../News/NewsDetail";
+import { colors, fonts } from "../../styles/theme";
 import {
   HiOutlineMail,
   HiOutlineNewspaper,
@@ -15,8 +9,16 @@ import {
 } from "react-icons/hi";
 import { IoSettingsOutline } from "react-icons/io5";
 
-import { dummyEmails, dummyNews } from "../../dummy/dummyData";
-import EventEmailWindow from "../Event/EventEmailWindow";
+import { getEmailDetail } from "../../api/dataApi";
+import { useWindowStore } from "../../stores/windowStore";
+
+import { dummyNews } from "../../dummy/dummyData";
+import Window from "./Window";
+import EmailWindow from "../Email/EmailWindow";
+import EmailCompose from "../Email/EmailCompose";
+import NewsWindow from "../News/NewsWindow";
+import NewsDetail from "../News/NewsDetail";
+import EmailDetailWindow from "../Email/EmailDetail";
 
 interface WindowData {
   id: number;
@@ -35,6 +37,25 @@ let nextId = 1;
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowData[]>([]);
   const [zIndex, setZIndex] = useState(10);
+
+  const { openWindowQueue, clearWindowQueue } = useWindowStore();
+  const { closeWindowQueue, clearCloseQueue } = useWindowStore();
+
+  useEffect(() => {
+    if (openWindowQueue.length > 0) {
+      const next = openWindowQueue[0];
+      openWindow(next.type || "external", next);
+      clearWindowQueue();
+    }
+  }, [openWindowQueue, clearWindowQueue]);
+
+  useEffect(() => {
+    if (closeWindowQueue.length > 0) {
+      const keyToClose = closeWindowQueue[0];
+      setWindows((prev) => prev.filter((w) => w.key !== keyToClose));
+      clearCloseQueue();
+    }
+  }, [closeWindowQueue]);
 
   const bringToFront = (id: number) => {
     setZIndex((prev) => {
@@ -70,9 +91,16 @@ const WindowManager = () => {
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
       const centerX = screenWidth / 2 - 150;
-      const centerY = screenHeight / 2 - 100;
-      const offsetX = Math.floor(Math.random() * 100 - 50);
-      const offsetY = Math.floor(Math.random() * 100 - 50);
+      const centerY = screenHeight / 2 - 250;
+
+      const isEvent = type === "event";
+
+      const x = isEvent
+        ? centerX
+        : centerX + Math.floor(Math.random() * 100 - 50);
+      const y = isEvent
+        ? centerY
+        : centerY + Math.floor(Math.random() * 100 - 50);
 
       const newWindow: WindowData = {
         id: nextId++,
@@ -80,8 +108,8 @@ const WindowManager = () => {
         type,
         title: payload.title,
         content: payload.content,
-        x: centerX + offsetX,
-        y: centerY + offsetY,
+        x,
+        y,
         zIndex: newZ,
         color: payload.color,
       };
@@ -106,23 +134,18 @@ const WindowManager = () => {
         title: "NEWS",
         content: <NewsWindow onNewsClick={handleNewsClick} />,
         key: "news",
+        color: colors.red,
       }),
     test: () =>
       openWindow("test", {
         title: "TEST",
-        content: (
-          <EventEmailWindow
-            title={dummyEmails[3].title}
-            content={dummyEmails[3].content}
-            writer={dummyEmails[3].writer}
-          />
-        ),
+        content: <></>,
         key: "test",
         color: colors.red,
       }),
   };
 
-  const handleEmailClick = (emailId: number) => {
+  const handleEmailClick = async (emailId: number) => {
     if (emailId === -1) {
       openWindow("email-compose", {
         key: "email-compose",
@@ -132,20 +155,24 @@ const WindowManager = () => {
       return;
     }
 
-    const email = dummyEmails.find((e) => e.id === emailId);
-    if (!email) return;
-
-    openWindow("email-detail", {
-      key: `email-detail:${email.id}`,
-      title: "E-MAIL",
-      content: (
-        <EmailDetail
-          title={email.title}
-          content={email.content}
-          writer={email.writer}
-        />
-      ),
-    });
+    try {
+      const email = await getEmailDetail(emailId);
+  
+      openWindow("email-detail", {
+        key: `email-detail:${email.eventId}`,
+        title: "E-MAIL",
+        content: (
+          <EmailDetailWindow
+            title={email.title}
+            content={email.content}
+            writer={email.writer}
+            choice={email.selectedChoice}
+          />
+        ),
+      });
+    } catch (err) {
+      console.error("이메일 상세 조회 실패:", err);
+    }
   };
 
   const handleNewsClick = (newsId: number) => {
@@ -156,6 +183,7 @@ const WindowManager = () => {
       key: `news-detail:${news.id}`,
       title: "NEWS",
       content: <NewsDetail title={news.title} content={news.content} />,
+      color: colors.red,
     });
   };
 

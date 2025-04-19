@@ -7,10 +7,12 @@ const EmailDetailWindow = ({
   title,
   content,
   writer,
+  choice,
 }: {
   title: string;
   content: string;
   writer: string;
+  choice: { id: number; content: string };
 }) => {
   const { show, hide } = useTooltipStore();
   const parts = content.split(/(\^.+?\^)/g);
@@ -46,6 +48,10 @@ const EmailDetailWindow = ({
             return <span key={i}>{part}</span>;
           }
         })}
+      </div>
+
+      <div key={choice.id} css={choiceBoxCss}>
+        <div css={choiceCss}>{choice.content}</div>
       </div>
     </div>
   );
@@ -92,4 +98,27 @@ const tooltipTarget = css({
   color: colors.white,
   cursor: "help",
   margin: "0 2px",
+});
+
+const choiceBoxCss = css({
+  display: "flex",
+  justifyContent: "flex-end",
+});
+
+const choiceCss = css({
+  color: colors.white,
+  fontFamily: fonts.fixel,
+  fontSize: "14px",
+  padding: "12px 20px",
+  borderRadius: "15px 15px 0px 15px",
+  border: `1px solid ${colors.neon}`,
+  maxWidth: "70%",
+  alignSelf: "flex-end",
+  backgroundColor: colors.dark,
+
+  margin: "8px 0",
+  "&:hover": {
+    backgroundColor: colors.wBackground,
+    cursor: "pointer",
+  },
 });

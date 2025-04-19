@@ -1,16 +1,18 @@
 import { css } from "@emotion/react";
 
-const StartScreen = ({ onStart }: { onStart: () => void }) => {
+const StartView = ({ onStart }: { onStart: () => void }) => {
   return (
-    <div css={startScreenCss}>
-      <button css={startBtnCss} onClick={onStart}>Start</button>
+    <div css={startViewCss}>
+      <button css={startBtnCss} onClick={onStart}>
+        Start
+      </button>
     </div>
   );
 };
 
-export default StartScreen;
+export default StartView;
 
-const startScreenCss = css({
+const startViewCss = css({
   width: "100vw",
   height: "100vh",
   backgroundColor: "black",

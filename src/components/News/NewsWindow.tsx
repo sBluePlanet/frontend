@@ -1,20 +1,27 @@
+import { useEffect } from "react";
 import { css } from "@emotion/react";
-import { dummyNews } from "../../dummy/dummyData";
 import { colors } from "../../styles/theme";
 import { GoAlert } from "react-icons/go";
+import { useNewsStore } from "../../stores/useNewsStore";
 
 interface NewsWindowProps {
   onNewsClick: (NewsId: number) => void;
 }
 
 const NewsWindow = ({ onNewsClick }: NewsWindowProps) => {
+  const { newsList, getList } = useNewsStore();
+
+  useEffect(() => {
+    getList();
+  }, []);
+
   return (
     <div css={listCss}>
-      {dummyNews.map((News) => (
+      {newsList.map((News) => (
         <div
-          key={News.id}
+          key={News.specialEventId}
           css={NewsItemCss}
-          onClick={() => onNewsClick(News.id)}
+          onClick={() => onNewsClick(News.specialEventId)}
         >
           <GoAlert color={colors.red} />
           <span css={titleCss}>{News.title}</span>
@@ -35,8 +42,8 @@ const listCss = css({
   overflowY: "auto",
   height: "100%",
   "& > *:not(:last-child)": {
-    borderBottom: `1px solid ${colors.normal}`, // 원하는 밑줄 스타일
-    paddingBottom: "8px", // 간격이 필요하다면 추가
+    borderBottom: `1px solid ${colors.red}`,
+    paddingBottom: "8px",
   },
 });
 
