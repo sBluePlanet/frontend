@@ -96,8 +96,10 @@ const PlayView = () => {
             }}
           />
         ),
-        closable: false,
         width: 300,
+        x: window.innerWidth / 2 - 150,
+        y: window.innerHeight / 2 - 150,
+        closable: false,
       });
     }
   }, [isEndingAlertVisible]);
