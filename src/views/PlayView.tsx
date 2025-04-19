@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
 
-import { colors } from "../styles/theme";
+import { colors, fonts } from "../styles/theme";
 import { useTooltipStore } from "../stores/useTooltipStore";
 import { useStatusStore } from "../stores/useStatusStore";
 import { useWindowStore } from "../stores/useWindowStore";
@@ -43,6 +43,7 @@ const PlayView = () => {
   const setUserId = useStatusStore((state) => state.setUserId);
   const setStatus = useStatusStore((state) => state.setStatus);
   const setNextEvent = useEventStore((state) => state.setNextEvent);
+  const decreaseTurn = useTurnStore((state) => state.decreaseTurn);
 
   const { visible, x, y, content } = useTooltipStore();
   const pushWindow = useWindowStore((state) => state.pushWindow);
@@ -163,6 +164,7 @@ const PlayView = () => {
     const currentTurn = useTurnStore.getState().turn;
 
     if (eventType === 3 || currentTurn <= 0) {
+      decreaseTurn();
       requestCloseWindow(closeKey);
       setEndingAlertVisible(true);
       return;
@@ -330,4 +332,5 @@ const loadingCss = css({
   fontSize: "20px",
   textAlign: "center",
   padding: "50px",
+  fontFamily: fonts.fixel,
 });

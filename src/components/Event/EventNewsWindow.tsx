@@ -1,5 +1,19 @@
+import { ReactNode } from "react";
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
+
+import { FaCloud } from "react-icons/fa";
+import { GiWaterDrop } from "react-icons/gi";
+import { FaHeartbeat } from "react-icons/fa";
+import { FaPerson } from "react-icons/fa6";
+import {
+  MdOutlineKeyboardArrowUp,
+  MdOutlineKeyboardArrowDown,
+  MdOutlineKeyboardDoubleArrowUp,
+  MdOutlineKeyboardDoubleArrowDown,
+} from "react-icons/md";
+import { useStatusStore } from "../../stores/useStatusStore";
+import { parseNewLine } from "../../utils/parseText";
 
 const images = import.meta.glob("../../assets/news/*.png", {
   eager: true,
@@ -22,12 +36,45 @@ const EventNewsWindow = ({
   onNext: () => void;
 }) => {
   const imageSrc = getImageByFilename(imgUrl);
+  const diff = useStatusStore.getState().getDiff();
+
+  const iconMap: Record<string, ReactNode> = {
+    air: <FaCloud />,
+    water: <GiWaterDrop />,
+    life: <FaHeartbeat />,
+    support: <FaPerson />,
+  };
 
   return (
     <div style={{ padding: "10px" }}>
       <div css={titlsCss}>{title}</div>
       <img src={imageSrc} css={imgCss} alt="뉴스 이미지" />
-      <div css={contentCss}>{content}</div>
+      <div css={contentCss}>{parseNewLine(content)}</div>
+      <div css={statusLineCss}>
+        {Object.entries(diff).map(([key, value]) => {
+          if (value === 0) return null;
+
+          const isIncrease = value > 0;
+          const isLargeChange = Math.abs(value) >= 10;
+
+          const ArrowIcon = isIncrease
+            ? isLargeChange
+              ? MdOutlineKeyboardDoubleArrowUp
+              : MdOutlineKeyboardArrowUp
+            : isLargeChange
+            ? MdOutlineKeyboardDoubleArrowDown
+            : MdOutlineKeyboardArrowDown;
+
+          const color = isIncrease ? colors.green : colors.red;
+
+          return (
+            <span key={key} css={statusItemCss}>
+              <span>{iconMap[key]}</span>
+              <ArrowIcon color={color} size={18} />
+            </span>
+          );
+        })}
+      </div>
       <button css={nextButtonCss} onClick={onNext}>
         next
       </button>
@@ -66,4 +113,18 @@ const nextButtonCss = css({
   "&:hover": {
     backgroundColor: colors.softRed,
   },
+});
+
+const statusLineCss = css({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "20px",
+  margin: "10px 0 20px 0",
+});
+
+const statusItemCss = css({
+  display: "flex",
+  alignItems: "center",
+  gap: "2px",
 });
