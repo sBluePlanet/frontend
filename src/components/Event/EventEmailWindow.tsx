@@ -2,7 +2,6 @@ import { useState } from "react";
 import { css } from "@emotion/react";
 
 import { colors, fonts } from "../../styles/theme";
-import { dummyTooltip } from "../../dummy/dummyData";
 import { useTooltipStore } from "../../stores/useTooltipStore";
 
 const EventEmailWindow = ({
@@ -23,15 +22,38 @@ const EventEmailWindow = ({
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
 
-  const { show, hide } = useTooltipStore();
-  
-  const parts = content.split(/(\^.+?\^)/g);
+  const { show, hide, tooltipData } = useTooltipStore();
 
   const handleClick = async (choiceId: number) => {
     if (selectedId !== null) return;
     setSelectedId(choiceId);
     const result = await onChoiceSelect(choiceId);
     setResultMessage(result);
+  };
+
+  const parseTextWithTooltip = (text: string) => {
+    const parts = text.split(/(\^.+?\^)/g);
+    return parts.map((part, i) => {
+      if (/^\^.+\^$/.test(part)) {
+        const word = part.replace(/\^/g, "");
+        const tooltip = tooltipData[word] || "설명이 없습니다.";
+        return (
+          <span
+            key={i}
+            css={tooltipTarget}
+            onMouseEnter={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              show(rect.left, rect.bottom + 3, tooltip);
+            }}
+            onMouseLeave={hide}
+          >
+            {word}
+          </span>
+        );
+      } else {
+        return <span key={i}>{part}</span>;
+      }
+    });
   };
 
   return (
@@ -44,35 +66,14 @@ const EventEmailWindow = ({
         <label css={labelCss}>발신자</label>
         <div css={textCss}>{writer}</div>
       </div>
-      <div css={contentCss}>
-        {parts.map((part, i) => {
-          if (/^\^.+\^$/.test(part)) {
-            const word = part.replace(/\^/g, "");
-            return (
-              <span
-                key={i}
-                css={tooltipTarget}
-                onMouseEnter={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  show(rect.left, rect.bottom + 3, dummyTooltip[word]);
-                }}
-                onMouseLeave={hide}
-              >
-                {word}
-              </span>
-            );
-          } else {
-            return <span key={i}>{part}</span>;
-          }
-        })}
-      </div>
+      <div css={contentCss}>{parseTextWithTooltip(content)}</div>
 
       {choices
         .filter((c) => selectedId === null || c.id === selectedId)
         .map((choice) => (
           <div key={choice.id} css={choiceBoxCss}>
             <div css={choiceCss} onClick={() => handleClick(choice.id)}>
-              {choice.content}
+              {parseTextWithTooltip(choice.content)}
             </div>
           </div>
         ))}

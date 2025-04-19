@@ -16,16 +16,28 @@ export const useWindowStore = create<{
   closeWindowQueue: string[];
   requestCloseWindow: (key: string) => void;
   clearCloseQueue: () => void;
-}>((set) => ({
+
+  currentZIndex: number;
+  nextZIndex: () => number;
+}>((set, get) => ({
   openWindowQueue: [],
   pushWindow: (data) =>
-    set((state) => ({ openWindowQueue: [...state.openWindowQueue, data] })),
+    set((state) => ({
+      openWindowQueue: [...state.openWindowQueue, data],
+    })),
   clearWindowQueue: () => set({ openWindowQueue: [] }),
 
   closeWindowQueue: [],
-  requestCloseWindow: (key: string) =>
+  requestCloseWindow: (key) =>
     set((state) => ({
       closeWindowQueue: [...state.closeWindowQueue, key],
     })),
   clearCloseQueue: () => set({ closeWindowQueue: [] }),
+
+  currentZIndex: 10,
+  nextZIndex: () => {
+    const next = get().currentZIndex + 1;
+    set({ currentZIndex: next });
+    return next;
+  },
 }));

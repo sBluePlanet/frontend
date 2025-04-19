@@ -6,6 +6,8 @@ export const colors = {
   dark: "#08806e",
   red: "#fb3048",
   white: "#ffffff",
+  black: "#000000",
+  green: "#0cfc5c",
   softRed: "rgb(251,48,72, 0.5)",
 };
 

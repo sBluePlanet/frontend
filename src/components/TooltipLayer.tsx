@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
 import { css } from "@emotion/react";
+import { colors } from "../styles/theme";
 
 interface TooltipProps {
   visible: boolean;
@@ -7,20 +8,6 @@ interface TooltipProps {
   y: number;
   content: string;
 }
-
-const tooltipCss = (x: number, y: number) =>
-  css({
-    position: "fixed",
-    top: y,
-    left: x,
-    backgroundColor: "black",
-    color: "white",
-    fontSize: "12px",
-    padding: "8px",
-    borderRadius: "4px",
-    pointerEvents: "none",
-    zIndex: 9999,
-  });
 
 const TooltipLayer = ({ visible, x, y, content }: TooltipProps) => {
   if (!visible) return null;
@@ -31,3 +18,17 @@ const TooltipLayer = ({ visible, x, y, content }: TooltipProps) => {
 };
 
 export default TooltipLayer;
+
+const tooltipCss = (x: number, y: number) =>
+  css({
+    maxWidth: "300px",
+    lineHeight: "1.5",
+    position: "fixed",
+    top: y,
+    left: x,
+    backgroundColor: colors.black,
+    color: colors.white,
+    fontSize: "14px",
+    padding: "10px 15px",
+    zIndex: 8888,
+  });

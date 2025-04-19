@@ -15,6 +15,7 @@ import {
   postChoice,
   getEndingData,
 } from "../api/gameApi";
+import { getTooltips } from "../api/dataApi";
 
 import GameStart from "../components/Event/GameStart";
 import GameEnding from "../components/Event/GameEnding";
@@ -48,6 +49,11 @@ const PlayView = () => {
       try {
         const data = await getStartData();
         const { prologue, userStatus, nextEvent } = data;
+
+        const tooltips = await getTooltips();
+        useTooltipStore.getState().setTooltipData(tooltips);
+
+        console.log("tooltips:", tooltips);
 
         setPrologue({
           title: prologue.title,

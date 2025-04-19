@@ -1,5 +1,4 @@
 import { css } from "@emotion/react";
-import { dummyTooltip } from "../../dummy/dummyData";
 import { useTooltipStore } from "../../stores/useTooltipStore";
 import { colors, fonts } from "../../styles/theme";
 
@@ -14,8 +13,32 @@ const EmailDetailWindow = ({
   writer: string;
   choice: { id: number; content: string };
 }) => {
-  const { show, hide } = useTooltipStore();
-  const parts = content.split(/(\^.+?\^)/g);
+  const { show, hide, tooltipData } = useTooltipStore();
+
+  const parseTextWithTooltip = (text: string) => {
+    const parts = text.split(/(\^.+?\^)/g);
+    return parts.map((part, i) => {
+      if (/^\^.+\^$/.test(part)) {
+        const word = part.replace(/\^/g, "");
+        const tooltipText = tooltipData[word] || "설명이 없습니다.";
+        return (
+          <span
+            key={i}
+            css={tooltipTarget}
+            onMouseEnter={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              show(rect.left, rect.bottom + 3, tooltipText);
+            }}
+            onMouseLeave={hide}
+          >
+            {word}
+          </span>
+        );
+      } else {
+        return <span key={i}>{part}</span>;
+      }
+    });
+  };
 
   return (
     <div css={wrapperCss}>
@@ -27,31 +50,10 @@ const EmailDetailWindow = ({
         <label css={labelCss}>발신자</label>
         <div css={textCss}>{writer}</div>
       </div>
-      <div css={contentCss}>
-        {parts.map((part, i) => {
-          if (/^\^.+\^$/.test(part)) {
-            const word = part.replace(/\^/g, "");
-            return (
-              <span
-                key={i}
-                css={tooltipTarget}
-                onMouseEnter={(e) => {
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  show(rect.left, rect.bottom + 3, dummyTooltip[word]);
-                }}
-                onMouseLeave={hide}
-              >
-                {word}
-              </span>
-            );
-          } else {
-            return <span key={i}>{part}</span>;
-          }
-        })}
-      </div>
+      <div css={contentCss}>{parseTextWithTooltip(content)}</div>
 
       <div key={choice.id} css={choiceBoxCss}>
-        <div css={choiceCss}>{choice.content}</div>
+        <div css={choiceCss}>{parseTextWithTooltip(choice.content)}</div>
       </div>
     </div>
   );
@@ -115,10 +117,5 @@ const choiceCss = css({
   maxWidth: "70%",
   alignSelf: "flex-end",
   backgroundColor: colors.dark,
-
   margin: "8px 0",
-  "&:hover": {
-    backgroundColor: colors.wBackground,
-    cursor: "pointer",
-  },
 });

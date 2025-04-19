@@ -38,13 +38,13 @@ const Gauge = ({ icon, value }: GaugeProps) => {
     if (value > prev) {
       setColor(colors.red);
     } else if (value < prev) {
-      setColor(colors.white);
+      setColor(colors.green);
     }
     prevValueRef.current = value;
 
     const timer = setTimeout(() => {
       setColor(colors.neon);
-    }, 500);
+    }, 700);
 
     return () => clearTimeout(timer);
   }, [value]);
@@ -82,9 +82,11 @@ const gaugeBarCss = (color: string) =>
   css({
     width: "80px",
     height: "15px",
-    backgroundColor: color,
+    backgroundColor: `${color}cc`,
+    boxShadow: `0 0 6px ${color}`,
     overflow: "hidden",
     clipPath: "polygon(10px 0%, 100% 0%, 70px 100%, 0% 100%)",
+    transition: "background-color 0.5s ease",
   });
 
 const fillCss = (value: number) =>

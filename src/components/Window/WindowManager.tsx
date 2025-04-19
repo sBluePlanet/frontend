@@ -35,7 +35,6 @@ let nextId = 1;
 
 const WindowManager = () => {
   const [windows, setWindows] = useState<WindowData[]>([]);
-  const [zIndex, setZIndex] = useState(10);
 
   const { openWindowQueue, clearWindowQueue } = useWindowStore();
   const { closeWindowQueue, clearCloseQueue } = useWindowStore();
@@ -57,13 +56,10 @@ const WindowManager = () => {
   }, [closeWindowQueue]);
 
   const bringToFront = (id: number) => {
-    setZIndex((prev) => {
-      const newZ = prev + 1;
-      setWindows((prevWindows) =>
-        prevWindows.map((w) => (w.id === id ? { ...w, zIndex: newZ } : w))
-      );
-      return newZ;
-    });
+    const topZ = useWindowStore.getState().nextZIndex();
+    setWindows((prevWindows) =>
+      prevWindows.map((w) => (w.id === id ? { ...w, zIndex: topZ } : w))
+    );
   };
 
   const openWindow = (
@@ -84,8 +80,7 @@ const WindowManager = () => {
         return prev;
       }
 
-      const newZ = zIndex + 1;
-      setZIndex(newZ);
+      const newZ = useWindowStore.getState().nextZIndex();
 
       const screenWidth = window.innerWidth;
       const screenHeight = window.innerHeight;
@@ -133,13 +128,6 @@ const WindowManager = () => {
         title: "NEWS",
         content: <NewsWindow onNewsClick={handleNewsClick} />,
         key: "news",
-        color: colors.red,
-      }),
-    test: () =>
-      openWindow("test", {
-        title: "TEST",
-        content: <></>,
-        key: "test",
         color: colors.red,
       }),
   };
@@ -211,7 +199,7 @@ const WindowManager = () => {
             <HiOutlineLightBulb size={40} />
             <div>Tips</div>
           </div>
-          <div css={desktopIconCss} onClick={() => predefinedMap["test"]?.()}>
+          <div css={desktopIconCss}>
             <IoSettingsOutline size={40} />
             <div>Test</div>
           </div>
