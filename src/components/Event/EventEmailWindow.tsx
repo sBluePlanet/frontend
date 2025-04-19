@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { css } from "@emotion/react";
 
 import { colors, fonts } from "../../styles/theme";
@@ -36,6 +36,7 @@ const EventEmailWindow = ({
   const [resultMessage, setResultMessage] = useState<string | null>(null);
   const diff = useStatusStore.getState().getDiff();
 
+  const [typingResult, setTypingResult] = useState("");
   const { show, hide, tooltipData } = useTooltipStore();
 
   const iconMap: Record<string, ReactNode> = {
@@ -51,6 +52,19 @@ const EventEmailWindow = ({
     const result = await onChoiceSelect(choiceId);
     setResultMessage(result);
   };
+
+  useEffect(() => {
+    if (!resultMessage) return;
+  
+    let i = 0;
+    const interval = setInterval(() => {
+      setTypingResult(resultMessage.slice(0, i + 1));
+      i++;
+      if (i >= resultMessage.length) clearInterval(interval);
+    }, 20);
+  
+    return () => clearInterval(interval);
+  }, [resultMessage]);
 
   return (
     <div css={wrapperCss}>
@@ -102,7 +116,7 @@ const EventEmailWindow = ({
             })}
           </div>
 
-          <div css={resultCss}>{resultMessage}</div>
+          <div css={resultCss}>{typingResult}</div>
 
           <button css={nextButtonCss} onClick={onNext}>
             next

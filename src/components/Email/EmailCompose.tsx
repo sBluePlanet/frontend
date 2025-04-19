@@ -94,7 +94,7 @@ const EmailCompose = () => {
       </div>
       <textarea
         css={textareaCss}
-        placeholder="내용을 입력하세요"
+        placeholder={`내용을 입력하세요\n(예: 수질을 개선하려면 어떻게 해야 하나요?)`}
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />

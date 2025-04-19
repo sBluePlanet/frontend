@@ -186,7 +186,7 @@ const WindowManager = () => {
       const email = await getEmailDetail(emailId);
 
       openWindow("email-detail", {
-        key: `email-detail:${email.eventId}`,
+        key: `email-detail:${emailId}`,
         title: "E-MAIL",
         content: (
           <EmailDetailWindow

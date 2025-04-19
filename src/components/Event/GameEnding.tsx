@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
 import { colors, fonts } from "../../styles/theme";
+import { parseNewLine } from "../../utils/parseText";
 
 interface GameEndingProps {
   onClick: () => void;
@@ -8,29 +10,35 @@ interface GameEndingProps {
 }
 
 const GameEnding = ({ onClick, title, content }: GameEndingProps) => {
+  const [typingText, setTypingText] = useState("");
+  const [isTypingDone, setIsTypingDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      setTypingText(content.slice(0, i + 1));
+      i++;
+      if (i >= content.length) {
+        clearInterval(interval);
+        setIsTypingDone(true);
+      }
+    }, 20);
+
+    return () => clearInterval(interval);
+  }, [content]);
+
   return (
     <div css={windowCss}>
       <div css={windowTopCss}>
         <span css={titleCss}>{title}</span>
       </div>
       <div css={contentCss}>
-        {content
-          .replace(/\r\n/g, "\n")
-          .replace(/\r/g, "\n")
-          .split(/\n{2,}/)
-          .map((paragraph, i) => (
-            <p key={i} style={{ marginBottom: "1.5em" }}>
-              {paragraph.split(/\n/).map((line, j) => (
-                <span key={j}>
-                  {line}
-                  {j !== paragraph.split(/\n/).length - 1 && <br />}
-                </span>
-              ))}
-            </p>
-          ))}
-        <button onClick={onClick} css={restartButtonCss}>
-          플레이 요약
-        </button>
+        {parseNewLine(typingText)}
+        {isTypingDone && (
+          <button onClick={onClick} css={restartButtonCss}>
+            당신은…
+          </button>
+        )}
       </div>
     </div>
   );

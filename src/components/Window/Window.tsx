@@ -77,7 +77,7 @@ const Window = ({
           </span>
         )}
       </div>
-      <div css={contentCss}>{children}</div>
+      <div css={contentCss(color)}>{children}</div>
     </div>
   );
 };
@@ -123,26 +123,27 @@ const titleCss = css({
   overflow: "hidden",
 });
 
-const contentCss = css({
-  padding: "10px",
-  lineHeight: "1.5",
-  maxHeight: "600px",
-  overflow: "auto",
-  scrollbarWidth: "thin",
-  scrollbarColor: `${colors.normal} transparent`,
-  "&::-webkit-scrollbar": {
-    width: "8px",
-  },
-  "&::-webkit-scrollbar-track": {
-    background: "transparent",
-  },
-  "&::-webkit-scrollbar-thumb": {
-    backgroundColor: colors.normal,
-    borderRadius: "4px",
-    border: "2px solid transparent",
-    backgroundClip: "content-box",
-  },
-});
+const contentCss = (color: string) =>
+  css({
+    padding: "10px",
+    lineHeight: "1.5",
+    maxHeight: "600px",
+    overflow: "auto",
+    scrollbarWidth: "thin",
+    scrollbarColor: `${color}cc transparent`,
+    "&::-webkit-scrollbar": {
+      width: "8px",
+    },
+    "&::-webkit-scrollbar-track": {
+      background: "transparent",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: `${color}cc`,
+      borderRadius: "4px",
+      border: "2px solid transparent",
+      backgroundClip: "content-box",
+    },
+  });
 
 const closeCss = css({
   cursor: "pointer",
