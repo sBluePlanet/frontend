@@ -1,6 +1,11 @@
 import axiosInstance from "./axiosInstance";
 import { useStatusStore } from "../stores/useStatusStore";
 
+export const getTooltips = async () => {
+  const response = await axiosInstance.get("/data/tooltips");
+  return response.data;
+};
+
 export const getEmailList = async () => {
   const userId = useStatusStore.getState().userId;
   const response = await axiosInstance.get("/data/emailList", {

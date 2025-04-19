@@ -9,10 +9,9 @@ import {
 } from "react-icons/hi";
 import { IoSettingsOutline } from "react-icons/io5";
 
-import { getEmailDetail } from "../../api/dataApi";
-import { useWindowStore } from "../../stores/windowStore";
+import { getEmailDetail, getNewsDetail } from "../../api/dataApi";
+import { useWindowStore } from "../../stores/useWindowStore";
 
-import { dummyNews } from "../../dummy/dummyData";
 import Window from "./Window";
 import EmailWindow from "../Email/EmailWindow";
 import EmailCompose from "../Email/EmailCompose";
@@ -157,7 +156,7 @@ const WindowManager = () => {
 
     try {
       const email = await getEmailDetail(emailId);
-  
+
       openWindow("email-detail", {
         key: `email-detail:${email.eventId}`,
         title: "E-MAIL",
@@ -175,16 +174,25 @@ const WindowManager = () => {
     }
   };
 
-  const handleNewsClick = (newsId: number) => {
-    const news = dummyNews.find((n) => n.id === newsId);
-    if (!news) return;
+  const handleNewsClick = async (newsId: number) => {
+    try {
+      const news = await getNewsDetail(newsId);
 
-    openWindow("news-detail", {
-      key: `news-detail:${news.id}`,
-      title: "NEWS",
-      content: <NewsDetail title={news.title} content={news.content} />,
-      color: colors.red,
-    });
+      openWindow("news-detail", {
+        key: `news-detail:${news.specialEventId}`,
+        title: "NEWS",
+        content: (
+          <NewsDetail
+            title={news.title}
+            content={news.content}
+            imgUrl={news.imgUrl}
+          />
+        ),
+        color: colors.red,
+      });
+    } catch (err) {
+      console.error("뉴스 상세 조회 실패:", err);
+    }
   };
 
   return (

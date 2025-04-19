@@ -4,23 +4,41 @@ import { css } from "@emotion/react";
 import { colors } from "../styles/theme";
 import { useTooltipStore } from "../stores/useTooltipStore";
 import { useStatusStore } from "../stores/useStatusStore";
-import { useWindowStore } from "../stores/windowStore";
+import { useWindowStore } from "../stores/useWindowStore";
 import { useEmailStore } from "../stores/useEmailStore";
-import { getStartData, getCommonEvent, postChoice } from "../api/gameApi";
+import { useEventStore } from "../stores/useEventStore";
+import { useTurnStore } from "../stores/useTurnStore";
+import {
+  getStartData,
+  getCommonEvent,
+  getSpecialEvent,
+  postChoice,
+  getEndingData,
+} from "../api/gameApi";
 
 import GameStart from "../components/Event/GameStart";
+import GameEnding from "../components/Event/GameEnding";
 import TopBar from "../components/Bar/TopBar";
 import WindowManager from "../components/Window/WindowManager";
 import TooltipLayer from "../components/TooltipLayer";
 import EventEmailWindow from "../components/Event/EventEmailWindow";
+import EventNewsWindow from "../components/Event/EventNewsWindow";
 
 const PlayView = () => {
   const [isGameStartVisible, setGameStartVisible] = useState(true);
   const [prologue, setPrologue] = useState({ title: "", content: "" });
-  const [nextEvent, setNextEvent] = useState<number | null>(null);
+  const [ending, setEnding] = useState<{
+    title: string;
+    content: string;
+  } | null>(null);
 
   const setUserId = useStatusStore((state) => state.setUserId);
   const setStatus = useStatusStore((state) => state.setStatus);
+  const nextEvent = useEventStore((state) => state.nextEvent);
+  const setNextEvent = useEventStore((state) => state.setNextEvent);
+  const turn = useTurnStore((state) => state.turn);
+  const decreaseTurn = useTurnStore((state) => state.decreaseTurn);
+
   const { visible, x, y, content } = useTooltipStore();
   const pushWindow = useWindowStore((state) => state.pushWindow);
   const requestCloseWindow = useWindowStore((s) => s.requestCloseWindow);
@@ -43,6 +61,7 @@ const PlayView = () => {
         setStatus("support", userStatus.popularity);
 
         setNextEvent(nextEvent);
+        console.log("nextEvent:", nextEvent);
       } catch (error) {
         console.error("Failed to fetch game start data:", error);
       }
@@ -68,7 +87,12 @@ const PlayView = () => {
               writer={event.writer}
               choices={choices}
               onChoiceSelect={handleChoiceSelect}
-              onNext={() => handleNextEvent(`event:${event.eventId}`)}
+              onNext={() =>
+                handleNextEvent(
+                  `event:${event.eventId}`,
+                  useEventStore.getState().nextEvent
+                )
+              }
             />
           ),
           key: `event:${event.eventId}`,
@@ -90,6 +114,8 @@ const PlayView = () => {
       setStatus("support", userStatus.popularity);
 
       setNextEvent(nextEvent);
+      console.log("nextEvent:", nextEvent);
+
       return result;
     } catch (error) {
       console.error("선택지 전송 실패:", error);
@@ -97,8 +123,26 @@ const PlayView = () => {
     }
   };
 
-  const handleNextEvent = async (closeKey: string) => {
-    if (nextEvent === 1) {
+  const handleNextEvent = async (
+    closeKey: string,
+    eventType: number | null
+  ) => {
+    decreaseTurn();
+
+    if (eventType === 3 || turn <= 0) {
+      try {
+        requestCloseWindow(closeKey);
+        const { title, content } = await getEndingData();
+
+        console.log("EndingTitle:", title);
+        console.log("EndingContent:", content);
+
+        setEnding({ title, content });
+      } catch (error) {
+        console.error("엔딩 데이터 로딩 실패:", error);
+      }
+      return;
+    } else if (eventType === 1) {
       try {
         requestCloseWindow(closeKey);
 
@@ -117,7 +161,12 @@ const PlayView = () => {
               writer={event.writer}
               choices={choices}
               onChoiceSelect={handleChoiceSelect}
-              onNext={() => handleNextEvent(`event:${event.eventId}`)}
+              onNext={() =>
+                handleNextEvent(
+                  `event:${event.eventId}`,
+                  useEventStore.getState().nextEvent
+                )
+              }
             />
           ),
           key: `event:${event.eventId}`,
@@ -125,6 +174,41 @@ const PlayView = () => {
         });
       } catch (error) {
         console.error("다음 common 이벤트 로딩 실패:", error);
+      }
+    } else if (eventType === 2) {
+      try {
+        requestCloseWindow(closeKey);
+
+        const response = await getSpecialEvent();
+        const { id, title, content, imgUrl, userStatus, nextEvent } = response;
+
+        setStatus("air", userStatus.air);
+        setStatus("water", userStatus.water);
+        setStatus("life", userStatus.biology);
+        setStatus("support", userStatus.popularity);
+        setNextEvent(nextEvent);
+
+        pushWindow({
+          type: "event-news",
+          title: "NEWS",
+          content: (
+            <EventNewsWindow
+              title={title}
+              content={content}
+              imgUrl={imgUrl}
+              onNext={() =>
+                handleNextEvent(
+                  `event-news:${id}`,
+                  useEventStore.getState().nextEvent
+                )
+              }
+            />
+          ),
+          key: `event-news:${id}`,
+          color: colors.red,
+        });
+      } catch (error) {
+        console.error("다음 special 이벤트 로딩 실패:", error);
       }
     }
   };
@@ -140,6 +224,17 @@ const PlayView = () => {
           />
         </div>
       )}
+
+      {ending && (
+        <div css={overlayCss}>
+          <GameEnding
+            title={ending.title}
+            content={ending.content}
+            onRestartClick={() => window.location.reload()}
+          />
+        </div>
+      )}
+
       <TopBar />
       <div css={mainAreaCss}>
         <WindowManager />
@@ -177,5 +272,5 @@ const overlayCss = css({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  zIndex: 10,
+  zIndex: 9999,
 });

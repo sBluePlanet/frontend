@@ -20,10 +20,11 @@ const EventEmailWindow = ({
   onChoiceSelect: (choiceId: number) => Promise<string>;
   onNext: () => void;
 }) => {
-  const { show, hide } = useTooltipStore();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [resultMessage, setResultMessage] = useState<string | null>(null);
 
+  const { show, hide } = useTooltipStore();
+  
   const parts = content.split(/(\^.+?\^)/g);
 
   const handleClick = async (choiceId: number) => {

@@ -2,8 +2,11 @@ import { css } from "@emotion/react";
 import { FaEarthAsia } from "react-icons/fa6";
 import StatusBar from "./StatusBar";
 import { colors, fonts } from "../../styles/theme";
+import { useTurnStore } from "../../stores/useTurnStore";
 
 const TopBar = () => {
+  const turn = useTurnStore((state) => state.turn);
+
   return (
     <div css={topBarCss}>
       <div css={{ color: colors.neon }}>
@@ -11,7 +14,7 @@ const TopBar = () => {
       </div>
       <StatusBar />
       <div>
-        <span css={bigNumberCss}>5</span>
+        <span css={bigNumberCss}>{turn}</span>
         <span css={smallNumberCss}>/20</span>
       </div>
     </div>

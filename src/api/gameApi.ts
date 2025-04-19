@@ -6,9 +6,25 @@ export const getStartData = async () => {
   return response.data;
 };
 
+export const getEndingData = async () => {
+  const userId = useStatusStore.getState().userId;
+  const response = await axiosInstance.get(`/game/ending`, {
+    params: { userId },
+  });
+  return response.data;
+};
+
 export const getCommonEvent = async () => {
   const userId = useStatusStore.getState().userId;
   const response = await axiosInstance.get("/game/common", {
+    params: { userId },
+  });
+  return response.data;
+};
+
+export const getSpecialEvent = async () => {
+  const userId = useStatusStore.getState().userId;
+  const response = await axiosInstance.get("/game/special", {
     params: { userId },
   });
   return response.data;
