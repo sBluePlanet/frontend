@@ -1,5 +1,7 @@
 import { css } from "@emotion/react";
 import { dummyEmails } from "../../dummy/dummyData";
+import { IoMailOpenOutline } from "react-icons/io5";
+import { colors, fonts } from "../../styles/theme";
 
 interface EmailWindowProps {
   onEmailClick: (emailId: number) => void;
@@ -22,7 +24,7 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
           css={emailItemCss}
           onClick={() => onEmailClick(email.id)}
         >
-          <span>✉️</span>
+          <IoMailOpenOutline />
           <span css={titleCss}>{email.title}</span>
         </div>
       ))}
@@ -33,13 +35,15 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
 export default EmailWindow;
 
 const composeBtnCss = css({
-  backgroundColor: "#003b44",
+  backgroundColor: colors.normal,
   color: "white",
   border: "none",
-  padding: "8px 10px",
+  padding: "10px",
   cursor: "pointer",
+  fontFamily: fonts.fixel,
+
   "&:hover": {
-    backgroundColor: "#005f6b",
+    backgroundColor: colors.dark,
   },
 });
 
@@ -59,7 +63,7 @@ const emailItemCss = css({
   cursor: "pointer",
   alignItems: "center",
   "&:hover": {
-    backgroundColor: "#003b44",
+    color: colors.neon,
   },
 });
 

@@ -3,7 +3,7 @@ import { colors } from "../../styles/theme";
 import { useStatusStore } from "../../stores/useStatusStore";
 import { ReactNode } from "react";
 
-import { FaWind } from "react-icons/fa";
+import { FaCloud } from "react-icons/fa";
 import { GiWaterDrop } from "react-icons/gi";
 import { FaHeartbeat } from "react-icons/fa";
 import { FaPerson } from "react-icons/fa6";
@@ -13,7 +13,7 @@ const StatusBar = () => {
 
   return (
     <div css={statusBarCss}>
-      <Gauge icon={<FaWind />} value={air} />
+      <Gauge icon={<FaCloud />} value={air} />
       <Gauge icon={<GiWaterDrop />} value={water} />
       <Gauge icon={<FaHeartbeat />} value={life} />
       <Gauge icon={<FaPerson />} value={support} />

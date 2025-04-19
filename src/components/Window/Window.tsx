@@ -60,7 +60,7 @@ const Window = ({
       onMouseLeave={handleMouseUp}
     >
       <div css={windowTopCss} onMouseDown={handleMouseDown}>
-        <span>{title}</span>
+        <span css={titleCss}>{title}</span>
         <span css={closeCss} onClick={onClose}>
           ×
         </span>
@@ -95,7 +95,13 @@ const windowTopCss = css({
   background: `linear-gradient(to right, ${colors.neon}, rgba(10, 183, 163, 0))`,
   borderBottom: `1px solid ${colors.neon}`,
   fontFamily: fonts.fixel,
+});
+
+const titleCss = css({
   color: "white",
+  whiteSpace: "nowrap",
+  textOverflow: "ellipsis",
+  overflow: "hidden",
 });
 
 const contentCss = css({

@@ -109,7 +109,7 @@ const WindowManager = () => {
     if (emailId === -1) {
       openWindow("email-compose", {
         key: "email-compose",
-        title: "새 이메일 작성",
+        title: "E-MAIL",
         content: <EmailCompose />,
       });
       return;
@@ -120,8 +120,14 @@ const WindowManager = () => {
 
     openWindow("email-detail", {
       key: `email-detail:${email.id}`,
-      title: `${email.title}`,
-      content: <EmailDetail title={email.title} content={email.content} />,
+      title: "E-MAIL",
+      content: (
+        <EmailDetail
+          title={email.title}
+          content={email.content}
+          writer={email.writer}
+        />
+      ),
     });
   };
 
@@ -131,7 +137,7 @@ const WindowManager = () => {
 
     openWindow("news-detail", {
       key: `news-detail:${news.id}`,
-      title: `${news.title}`,
+      title: "NEWS",
       content: <NewsDetail title={news.title} content={news.content} />,
     });
   };
