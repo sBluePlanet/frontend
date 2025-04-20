@@ -50,6 +50,8 @@ const EmailCompose = () => {
         title: `RE: ${title}`,
         content: <EmailWaitingWindow />,
         color: colors.neon,
+        x: window.innerWidth / 2 - 150,
+        y: window.innerHeight / 2 - 150,
       });
 
       const res = await getAdvice(eventId, title, content);
@@ -94,7 +96,7 @@ const EmailCompose = () => {
       </div>
       <textarea
         css={textareaCss}
-        placeholder={`내용을 입력하세요\n(예: 수질을 개선하려면 어떻게 해야 하나요?)`}
+        placeholder={`과학 전문가에게 조언을 구해보세요.\n예) 삼투압식 필터를 도입하면 어떻게 되나요?`}
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />

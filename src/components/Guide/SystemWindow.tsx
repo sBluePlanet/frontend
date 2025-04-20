@@ -25,11 +25,11 @@ const restartButtonCss = css({
   padding: "5px 10px",
   fontSize: "16px",
   fontFamily: fonts.fixel,
-  backgroundColor: colors.red,
+  backgroundColor: colors.dred,
   color: `${colors.white}`,
   border: "none",
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: "#d32f2f",
+    backgroundColor: colors.red,
   },
 });

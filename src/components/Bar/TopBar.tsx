@@ -10,7 +10,7 @@ const TopBar = () => {
   return (
     <div css={topBarCss}>
       <div css={{ color: colors.neon }}>
-        <FaEarthAsia /> Blue Planet
+        <FaEarthAsia /> <span css={{ fontSize: "22px" }}>Blue Planet</span>
       </div>
       <StatusBar />
       <div>

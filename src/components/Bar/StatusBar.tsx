@@ -87,10 +87,13 @@ const gaugeBarCss = () =>
     transition: "background-color 0.5s ease",
   });
 
-const fillCss = (value: number, color: string) =>
-  css({
-    width: `${value}%`,
+const fillCss = (value: number, color: string) => {
+  const clampedValue = Math.max(0, Math.min(100, value));
+
+  return css({
+    width: `${clampedValue}%`,
     height: "100%",
     backgroundColor: `${color}cc`,
     transition: "width 0.3s ease",
   });
+};

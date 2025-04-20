@@ -6,7 +6,7 @@ import { IoMailOpenOutline } from "react-icons/io5";
 import { useEmailStore } from "../../stores/useEmailStore";
 
 interface EmailWindowProps {
-  onEmailClick: (emailId: number, type:string) => void;
+  onEmailClick: (emailId: number, type: string) => void;
 }
 
 const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
@@ -23,11 +23,14 @@ const EmailWindow = ({ onEmailClick }: EmailWindowProps) => {
   return (
     <div css={listCss}>
       <button css={composeBtnCss} onClick={handleComposeClick}>
-        조언가에게 이메일 작성
+        과학 전문가에게 이메일 작성
       </button>
 
       {emailList.map((email) => (
-        <div css={emailItemCss} onClick={() => onEmailClick(email.id, email.type)}>
+        <div
+          css={emailItemCss}
+          onClick={() => onEmailClick(email.id, email.type)}
+        >
           <IoMailOpenOutline />
           <span css={titleCss}>{email.title}</span>
         </div>

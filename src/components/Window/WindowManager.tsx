@@ -167,6 +167,8 @@ const WindowManager = () => {
         key: "system",
         color: colors.red,
         width: 300,
+        x: 130,
+        y: window.innerHeight / 2 - 90,
       }),
   };
 
